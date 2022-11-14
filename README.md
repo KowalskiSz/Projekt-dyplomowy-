@@ -4,3 +4,6 @@ Plik do dalszej edycji...
 
 ##
 Dalsze przykładowe edycje...
+
+##
+Kolejne testpwe edycje
