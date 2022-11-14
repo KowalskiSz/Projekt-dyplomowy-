@@ -1,1 +1,3 @@
-# Projekt-dyplomowy-
+# Projekt inzynierski - final project
+
+Plik do dalszej edycji...
