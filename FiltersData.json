@@ -1,0 +1,37 @@
+{
+    "filter" : [
+        {
+            "QRnumCode": "000001",
+            "fileName": "filtr_000001.txt"
+        },
+        {
+            "QRnumCode": "000002",
+            "fileName": "filtr_000002.txt"
+        },
+        {
+            "QRnumCode": "000003",
+            "fileName": "filtr_000003.txt"
+        },
+        {
+            "QRnumCode": "000004",
+            "fileName": "filtr_000004.txt"
+        },
+        {
+            "QRnumCode": "000005",
+            "fileName": "filtr_000005.txt"
+        },
+        {
+            "QRnumCode": "000006",
+            "fileName": "filtr_000006.txt"
+        }, 
+        {
+            "QRnumCode": "000007",
+            "fileName": "filtr_000007.txt"
+        },
+        {
+            "QRnumCode": "000008",
+            "fileName": "filtr_000008.txt"
+        }
+    ]
+
+}
