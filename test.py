@@ -105,6 +105,7 @@ while not res.empty():
 
 plt.plot(freq,finalList)
 plt.show()
+
 '''
 Wykres tłumenia jest zły, 
 nie wiem dlaczego tak wychodzi, 
