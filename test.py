@@ -25,9 +25,14 @@ Próby wydają się być OK, następuje zmiana amplitudy sygnału z każdyą zmi
 '''
 amplitude = 1
 sampleSize = 1000
-sampleRate = [400,800,1200,1600,2000,2400,2800,3200,3600,4000,4400,4800,5200,5600,6000,6400,6800,7200,7600,8000,8400,8800,9200,9600,10000,20000,25000,30000,35000,40000,45000]
-freq = [5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120,125,130,200,300,400,500]
 
+sampleRate = [400,800,1200,1600,2000,2400,2800,3200,3600,4000,4400,4800,5200,5600,6000,6400,6800,7200,7600,8000,8400,8800,9200,12000,14000,16000,18000,20000,22000,24000,26000,28000,30000,32000,34000,36000,]
+freq = [5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120,125,130,200,300,400,500,600,700,800,900,1000,1500]
+'''
+SampleRates - trzeba pomyśleć jak je ułozyć dla dużych częstotliwośc > 1000
+'''
+#sampleRate = np.arange(400, 14400 ,400).tolist()
+#freq = [5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120,125,150,200,300,400,500,600,700,800,900,1000] 
 
 q = queue.Queue()
 qAmps = queue.Queue()
@@ -47,21 +52,32 @@ for f, sr in zip (freq, sampleRate):
 
     signalGen.endGen()
 
-    np_fft = np.fft.fft(signalRead.dataContainer[250:])
+    '''
+    Poprawna akwizycja i obliczanie amplitud syg. dla 
+    danej częstotliwości
+
+    '''
+    np_fft = np.fft.fft(signalRead.dataContainer[200:])
     #amplitudes = 2 / sampleSize * np.abs(np_fft)
-    amplitudes = (np.abs(np_fft) / sampleSize)            
-    amplitudes=list(amplitudes)
+    amplitudes = (np.abs(np_fft) / sampleSize) 
+
+    aPlot = 2 * amplitudes[0:int(sampleSize/2 + 1)]
+
+    #amplitudes=list(amplitudes)
+    
+    
     #print(type(amplitudes))
     #print(amplitudes)
-    peak = find_peaks(amplitudes, height=0)
+    peak = find_peaks(aPlot, height=0)
     heights = peak[1]['peak_heights']
     maxVals = list(map(float, heights))
-    newMaxVals = [x / 1000 for x in maxVals]
+    #newMaxVals = [x / 1000 for x in maxVals]
     
     #print(heights)
     #print(len(heights))
-    curAmp = np.amax(newMaxVals)
+    curAmp = np.amax(maxVals)
     qAmps.put(curAmp)
+
     #print(curAmp)
     # for a in peak:
     #     qAmps.put(np.amax(a) / 1000)
@@ -81,16 +97,24 @@ for f, sr in zip (freq, sampleRate):
 
 # plt.plot(heights)
 # plt.show()
-
+'''
+Kolejkowanie otrzymanych wartości amplitud
+'''
 while not qAmps.empty(): 
+
     peaksVals.append(qAmps.get())
 
-#print(peaksVals)
+print(peaksVals)
 
 results = queue.Queue()
+
+'''
+Funkcja do obliczania tłumnienia
+'''
 def dampingCount(amps):
     for a in amps: 
-        results.put(20*(math.log10(a/1)))
+        v = 20*(np.log10(a))
+        results.put(v)
 
     return results
 
@@ -104,14 +128,15 @@ while not res.empty():
 
 
 plt.plot(freq,finalList)
+plt.xscale('log')
+plt.grid()
 plt.show()
 
 '''
-Wykres tłumenia jest zły, 
-nie wiem dlaczego tak wychodzi, 
-sekwencja testująca wydaje się być poprawna 
-Może trzeba będzie spróbować robić test jednym cyklem siunusoidy 
-
+Wykres tłumenia jest poprawny,  
+sekwencja testująca wydaje się być poprawna, 
+trzeba zmienić wartości sampleRate dla wyższych częstotliwości
+Trzeba dodać weryfikacje poprawności testu dla wartości z plików .txt 
 '''
 
 
