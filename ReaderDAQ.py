@@ -14,7 +14,7 @@ class SignalReader():
     #incomingData = pyqtSignal(object)
 
 
-    def __init__(self, sample_size):
+    def __init__(self):
         super().__init__()
 
         self.reader = None
@@ -22,10 +22,12 @@ class SignalReader():
         self.is_done = False
 
         #self.sample_rate = sample_rate
-        self.sample_size = sample_size
+
+        #self.sample_size = sample_size
+
         #self.ui_queue = ui_queue
 
-        self.dataContainer = np.empty(shape=(self.sample_size,),dtype=np.float64)
+        #self.dataContainer = np.empty(shape=(self.sample_size,),dtype=np.float64)
 
     '''
     Nie do końca wiem o co z tym chodzi, możliwe że trzeba to będzie rozważyć 
@@ -47,11 +49,16 @@ class SignalReader():
 
         
 
-    def create_task(self, sample_rate): 
+    def create_task(self, sample_rate, sample_size): 
         '''
         Create read task from daq
         '''
-       
+        '''
+        Zmieniona została inicjalizacja dataContainera z konstruktora na wywołanie dynamiczne w funkcji 
+        W sumie to chyba do zmiany początowej z init z konstruktora 
+        '''
+        
+        self.dataContainer = np.empty(shape=(sample_size,),dtype=np.float64)
 
         try: 
             self.task = nidaqmx.Task()
@@ -66,14 +73,14 @@ class SignalReader():
             return
 
             
-        self.task.timing.cfg_samp_clk_timing(rate=sample_rate, sample_mode=AcquisitionType.FINITE,samps_per_chan=self.sample_size)
+        self.task.timing.cfg_samp_clk_timing(rate=sample_rate, sample_mode=AcquisitionType.FINITE,samps_per_chan=sample_size)
         #self.task.in_stream.input_buf_size = 4000
         
         print("Starting taks")
         self.task.start()
         self.reader = AnalogSingleChannelReader(self.task.in_stream)
 
-        self.reader.read_many_sample(data=self.dataContainer, number_of_samples_per_channel=self.sample_size)
+        self.reader.read_many_sample(data=self.dataContainer, number_of_samples_per_channel=sample_size)
 
         
         

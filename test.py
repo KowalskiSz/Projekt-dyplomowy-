@@ -24,12 +24,14 @@ Próby wydają się być OK, następuje zmiana amplitudy sygnału z każdyą zmi
 
 '''
 amplitude = 1
-sampleSize = 1000
+#Na razie zostawiam roboczy na czas pisania klasy weryfikacji
+sampleSize = [1000] * 38 #+ [2000,2000,2000,2000,3000,3000,3000,3000,4000,4000,5000,5000,5000]
 
-sampleRate = [400,800,1200,1600,2000,2400,2800,3200,3600,4000,4400,4800,5200,5600,6000,6400,6800,7200,7600,8000,8400,8800,9200,12000,14000,16000,18000,20000,22000,24000,26000,28000,30000,32000,34000,36000,]
-freq = [5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120,125,130,200,300,400,500,600,700,800,900,1000,1500]
+sampleRate = [400,800,1200,1600,2000,2400,2800,3200,3600,4000,4400,4800,5200,5600,6000,6400,6800,7200,7600,8000,8400,8800,9200,9600,10000,10400,16000,24000,32000,40000,48000,56000,62000,70000,78000,85000]
+freq = [5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120,125,130,200,300,400,500,600,700,800,900,1000,10000]
 '''
-SampleRates - trzeba pomyśleć jak je ułozyć dla dużych częstotliwośc > 1000
+SampleRates - zwiększać proporcjonalnie do częstotliwości
+I dla dużych częst. spokooojnie bo się psuje 
 '''
 #sampleRate = np.arange(400, 14400 ,400).tolist()
 #freq = [5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120,125,150,200,300,400,500,600,700,800,900,1000] 
@@ -41,14 +43,14 @@ yVals = list()
 peaksVals = list()
 
 
-signalGen = SignalWriter(amplitude, 200)
-signalRead = SignalReader(sampleSize)
+signalGen = SignalWriter(amplitude, 200) #Sample generowane 200
+signalRead = SignalReader() #Zmieniony został atrybut sampleSize na dynamiczny 
 
-for f, sr in zip (freq, sampleRate): 
+for f, sr, sSize in zip (freq, sampleRate, sampleSize): 
 
     signalGen.createTask(f, sr)
                
-    signalRead.create_task(sr)
+    signalRead.create_task(sr,sSize)
 
     signalGen.endGen()
 
@@ -59,9 +61,9 @@ for f, sr in zip (freq, sampleRate):
     '''
     np_fft = np.fft.fft(signalRead.dataContainer[200:])
     #amplitudes = 2 / sampleSize * np.abs(np_fft)
-    amplitudes = (np.abs(np_fft) / sampleSize) 
+    amplitudes = (np.abs(np_fft) / sSize) 
 
-    aPlot = 2 * amplitudes[0:int(sampleSize/2 + 1)]
+    aPlot = 2 * amplitudes[0:int(sSize/2 + 1)]
 
     #amplitudes=list(amplitudes)
     
@@ -104,7 +106,7 @@ while not qAmps.empty():
 
     peaksVals.append(qAmps.get())
 
-print(peaksVals)
+#print(peaksVals)
 
 results = queue.Queue()
 
@@ -124,7 +126,7 @@ finalList = list()
 while not res.empty():
     finalList.append(res.get())
 
-#print(finalList)
+#print(len(finalList))
 
 
 plt.plot(freq,finalList)

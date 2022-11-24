@@ -50,27 +50,27 @@ class SinGen():
         return a 
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    sin = SinGen()
-    sinus = sin.generateWave(1,50,2000)
-    sin.fft(sinus)
+#     sin = SinGen()
+#     sinus = sin.generateWave(1,50,2000)
+#     sin.fft(sinus)
 
-    peak = find_peaks(sin.aPlot, height=0)
-    heights = peak[1]['peak_heights']
-    maxVals = list(map(float, heights))
+#     peak = find_peaks(sin.aPlot, height=0)
+#     heights = peak[1]['peak_heights']
+#     maxVals = list(map(float, heights))
 
-    #newMaxVals = [x for x in maxVals]
+#     #newMaxVals = [x for x in maxVals]
 
-    #print(type(sin.aPlot))
+#     #print(type(sin.aPlot))
     
-    #print(maxVals)
-    #print(len(heights))
-    curAmp = np.amax(maxVals)
-    print(curAmp)
+#     #print(maxVals)
+#     #print(len(heights))
+#     curAmp = np.amax(maxVals)
+#     print(curAmp)
 
-    fig, [ax1, ax2] = plt.subplots(nrows=2, ncols=1)
-    ax1.plot(sin.timeS, sinus, '.-')
-    ax2.plot(sin.fplot, sin.aPlot, '.-')
-    plt.show()
+#     fig, [ax1, ax2] = plt.subplots(nrows=2, ncols=1)
+#     ax1.plot(sin.timeS, sinus, '.-')
+#     ax2.plot(sin.fplot, sin.aPlot, '.-')
+#     plt.show()
 
