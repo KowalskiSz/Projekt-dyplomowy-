@@ -17,6 +17,7 @@ class QRThread(QThread):
         super().__init__()
 
         self.flag = False
+        self.arrayOfData = list()
     
     def run(self): 
 
@@ -106,9 +107,24 @@ class QRThread(QThread):
         if self.flagDoneAqq == True:
 
             with open(f'Files/{fName}', 'r') as file: 
+                
                 lines = file.read().splitlines()
+                #lines = file.readlines()
+            
             file.close()
-            return lines 
+
+            '''
+            Konwersja listy na liste list trzy elementowych 
+            przeksztacić to w array 
+            raczej zmianne klasy 
+            '''
+            listOfElements = list()
+            for line in lines: 
+                
+                listOfElements.append(line.split())
+            
+
+            return listOfElements 
 
         else: 
             print("Unable to open the file")

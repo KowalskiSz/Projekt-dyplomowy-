@@ -242,8 +242,9 @@ class acqThread(QtCore.QThread):
 
             self.amplitude = 1
             self.sampleSize = 1000
-            self.sampleRate = [4000]
-            self.freq = [50]
+            self.sampleRate = [400,400,800,1200,1600,2000,2400,2800,3200,3600,4000,4400,4800,5200,5600,6000,6400,6800,7200,7600,8000,8400,8800,9200,9600,10000,10400,16000,24000,32000,40000,48000,56000,62000,70000,78000,85000,100000]
+            self.freq = [1,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120,125,130,200,300,400,500,600,700,800,900,1000,10000,25000]
+
 
             '''
             Lista i kolejka do obsługi poprawnej danych wyjściowych 
@@ -257,14 +258,16 @@ class acqThread(QtCore.QThread):
         def run(self):
 
             self.signalGen = SignalWriter(self.amplitude, self.sampleSize)
-            self.signalRead = SignalReader(self.sampleSize)
+            self.signalRead = SignalReader()
             
 
             for f, sr in zip (self.freq, self.sampleRate): 
 
                 self.signalGen.createTask(f, sr)
                
-                self.signalRead.create_task(sr)
+                self.signalRead.create_task(sr,self.sampleSize)
+
+                self.signalGen.endGen()
 
                 #Oczyt amplitudy syganału
                 np_fft = np.fft.fft(self.signalRead.dataContainer)
@@ -283,7 +286,7 @@ class acqThread(QtCore.QThread):
 
                     self.q.put(val)
 
-                self.signalGen.endGen()
+                
 
             
             while not self.q.empty():
@@ -293,7 +296,7 @@ class acqThread(QtCore.QThread):
             while not self.qAmps.empty(): 
                 self.peaksVals.append(self.qAmps.get())            
             
-            print(self.peaksVals)
+            #print(self.peaksVals)
             
             self.plotVals.emit(self.yVals)
             self.ampPeaks.emit(self.peaksVals)
