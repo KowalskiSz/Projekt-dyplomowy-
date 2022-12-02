@@ -17,7 +17,8 @@ class QRThread(QThread):
         super().__init__()
 
         self.flag = False
-        self.arrayOfData = list()
+        self.outputArray = None
+        
     
     def run(self): 
 
@@ -114,17 +115,18 @@ class QRThread(QThread):
             file.close()
 
             '''
-            Konwersja listy na liste list trzy elementowych 
-            przeksztacić to w array 
-            raczej zmianne klasy 
+            KOonwersja odczytanych danych z pliku na nparray tak jak wymaga tego 
+            klasa verfiyModule 
             '''
             listOfElements = list()
             for line in lines: 
                 
                 listOfElements.append(line.split())
             
-
-            return listOfElements 
+            self.outputArray = np.asarray(listOfElements, dtype=int)
+            
+        
+            return self.outputArray 
 
         else: 
             print("Unable to open the file")

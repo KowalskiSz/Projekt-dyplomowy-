@@ -101,7 +101,7 @@ class Ui_MainWindow(object):
         self.leabelNo1.setPixmap(QPixmap.fromImage(image))
 
         if self.QRThread.flag == True: 
-            #print("HERE")
+            
             QTimer.singleShot(1000, self.clearLabel)
 
             self.QRThread.resutCheck(self.QRThread.data)
