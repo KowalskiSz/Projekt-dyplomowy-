@@ -115,7 +115,7 @@ class QRThread(QThread):
             file.close()
 
             '''
-            KOonwersja odczytanych danych z pliku na nparray tak jak wymaga tego 
+            Konwersja odczytanych danych z pliku na nparray tak jak wymaga tego 
             klasa verfiyModule 
             '''
             listOfElements = list()
