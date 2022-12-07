@@ -98,6 +98,7 @@ class Ui_MainWindow(object):
     wyprintowanie info tymczasowo 
     '''
     def imageUpdateSlot(self, image): 
+        
         self.leabelNo1.setPixmap(QPixmap.fromImage(image))
 
         if self.QRThread.flag == True: 

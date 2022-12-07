@@ -12,6 +12,7 @@ from PyQt5.QtGui import *
 class QRThread(QThread): 
     
     ImageUpdate = pyqtSignal(QImage)
+    finishedTask = pyqtSignal()
     
     def __init__(self):
         super().__init__()
@@ -98,6 +99,7 @@ class QRThread(QThread):
                     continue
 
             if self.fileName == None: 
+
                 print("Such filter does not exists")
     '''
     Tymczasowa funkcja przetwarzająca zczytany wynik 
