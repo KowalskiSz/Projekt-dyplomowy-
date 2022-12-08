@@ -4,6 +4,20 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtWidgets import QApplication, QMainWindow, QSizeGrip, QMessageBox
 from PyQt5.QtCore import QCoreApplication
 
+import nidaqmx
+import numpy as np
+
+from ReaderDAQ import * 
+from WriterDAQ import * 
+
+import queue
+
+import math
+
+from scipy import signal
+from scipy.signal import find_peaks
+from verifyModue import * 
+
 from QRThread import * 
 from DataBaseClass import * 
 
@@ -50,9 +64,11 @@ class MainWindow(QMainWindow):
         '''
         QRcode reader section
         '''
+        self.abortFlag = False #Flag to prevent the abort qr read error
+        print(self.abortFlag)
         self.qrAcqButton.clicked.connect(self.QRFun)
-        
         self.abortScanButton.clicked.connect(self.abortFun)
+        
        
         '''
         Submit chosen filter by selecting with combobox
@@ -100,7 +116,7 @@ class MainWindow(QMainWindow):
         self.QRThread.start()
 
         #self.camQR.clear()
-        self.resQRLabel.clear()
+        #self.resQRLabel.clear()
         self.QRThread.ImageUpdate.connect(self.imageUpdateSlot)
         self.QRThread.finished.connect(self.popUpQRMessage)
         self.QRThread.finished.connect(lambda: self.dataBaseConnection(self.QRThread.data))
@@ -138,7 +154,9 @@ class MainWindow(QMainWindow):
 
     def abortFun(self): 
 
+        self.abortFlag = True
         self.QRThread.terminate()
+
         self.QRThread.cap.release()
         self.camQR.clear()
 
@@ -156,18 +174,21 @@ class MainWindow(QMainWindow):
     '''
     def dataBaseConnection(self, filterNumber): 
 
-        self._dataBaseInst = DatabaseReader(filterNumber)
-        self._dataBaseInst.exeFun()
+        if not self.abortFlag: #saves from not executing qr read by aborting the process
+            self._dataBaseInst = DatabaseReader(filterNumber)
+            self._dataBaseInst.exeFun()
 
-        '''
-        Setting up a variable that holds info about filter
-        used next to initialize the test  
-        '''
-        self.selectedFilterDic = self._dataBaseInst.dataDic
+            '''
+            Setting up a variable that holds info about filter
+            used next to initialize the test  
+            '''
+            self.selectedFilterDic = self._dataBaseInst.dataDic
 
-        self.filterTab.setItem(0, 0, QTableWidgetItem(self._dataBaseInst.dataDic["FilterID"]))
-        self.filterTab.setItem(0, 1, QTableWidgetItem(self._dataBaseInst.dataDic["Type"]))
-        self.filterTab.setItem(0, 2, QTableWidgetItem(self._dataBaseInst.dataDic["DampInfo"]))
+            self.filterTab.setItem(0, 0, QTableWidgetItem(self._dataBaseInst.dataDic["FilterID"]))
+            self.filterTab.setItem(0, 1, QTableWidgetItem(self._dataBaseInst.dataDic["Type"]))
+            self.filterTab.setItem(0, 2, QTableWidgetItem(self._dataBaseInst.dataDic["DampInfo"]))
+        else: 
+            return 0 
         
     
     def popUpMessage(self): 
@@ -211,7 +232,24 @@ class MainWindow(QMainWindow):
             event.ignore()
 
 
+'''
+Data acqusition and test sequence thread class
+'''
+class acqAndTestThread(QtCore.QThread): 
 
+    def __init__(self, amp, sampleSize, sampleRate, frequency):
+        super().__init__() 
+
+        self.amplitude = amp
+        self.sampleSize = sampleSize
+        self.sampleRate = sampleRate
+        self.freq = frequency
+
+        self.q = queue.Queue()
+        self.qAmps = queue.Queue()
+
+        self.yVals = list() 
+        self.peaksVals = list()
 
 
 

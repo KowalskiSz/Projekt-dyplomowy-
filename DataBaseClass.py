@@ -48,7 +48,13 @@ class DatabaseReader:
         self._conn.commit()
         self._conn.close()
 
-        self.dataDic = dict(zip(self._column, self._items))
+        if self._column and self._items is None: 
+            
+            return 0 
+
+        else: 
+
+            self.dataDic = dict(zip(self._column, self._items))
 
         #return  self.dataDic
 
