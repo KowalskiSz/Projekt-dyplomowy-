@@ -19,7 +19,7 @@ class SignalWriter():
 
     #incoming_data = QtCore.pyqtSignal(object)
 
-    def __init__(self, amplitude, sampleSize):
+    def __init__(self, amplitude, sampleSize, daqSetup):
         
         self.amplitude = amplitude
         self.sampleSize = sampleSize
@@ -34,6 +34,8 @@ class SignalWriter():
         #self.wave_gen = WaveGeneration()
         #self.wave_gen = SinGenAnt()
         self.wave_gen = SinGen()
+
+        self.daqSetup = daqSetup
         
 
     
@@ -69,7 +71,7 @@ class SignalWriter():
             print("DAQ is not connected, task could not be created")
             return 
 
-        self.task.ao_channels.add_ao_voltage_chan("Dev1/ao0", max_val=5, min_val=-5)
+        self.task.ao_channels.add_ao_voltage_chan(self.daqSetup , max_val=5, min_val=-5)
         #self.task.ao_channels.add_ao_func_gen_chan("Dev1/ao0", type=FuncGenType.SINE,freq=100.0, amplitude=1.0, offset=0.0) #TUTAJ SKOŃCZONE
         #buffer_lenght = self.sampleSize
 

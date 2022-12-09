@@ -14,12 +14,14 @@ class SignalReader():
     #incomingData = pyqtSignal(object)
 
 
-    def __init__(self):
+    def __init__(self, AISetup):
         super().__init__()
 
         self.reader = None
         self.is_running = False
         self.is_done = False
+
+        self.AISetup = AISetup
 
         #self.sample_rate = sample_rate
 
@@ -67,7 +69,7 @@ class SignalReader():
             return
 
         try: 
-            self.task.ai_channels.add_ai_voltage_chan("Dev1/ai0") 
+            self.task.ai_channels.add_ai_voltage_chan(self.AISetup) 
         except: 
             print("No such channel exists")
             return

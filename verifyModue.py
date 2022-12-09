@@ -33,20 +33,20 @@ class VerifyModule():
                        
                         self.arrayOfVals[self.counter] = 1
                         self.counter = self.counter + 1
-                        print(f'{self.damps[i]}, {self.frequency[i]}')
+                        #print(f'{self.damps[i]}, {self.frequency[i]}')
                     
                         
                     else:
 
                         self.arrayOfVals[self.counter] = 0
                         self.counter = self.counter + 1
-                        print(f'{self.damps[i]}, {self.frequency[i]}')
+                        #print(f'{self.damps[i]}, {self.frequency[i]}')
                 else: 
                     
                     continue
         
         self.result = np.max(self.arrayOfVals) == np.min(self.arrayOfVals)
-        print(self.arrayOfVals)
+        #print(self.arrayOfVals)
         
 
         return self.result

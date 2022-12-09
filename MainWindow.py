@@ -1,11 +1,15 @@
 import sys
 from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtWidgets import QApplication, QMainWindow, QSizeGrip, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QSizeGrip, QMessageBox, QWidget
 from PyQt5.QtCore import QCoreApplication
+
 
 import nidaqmx
 import numpy as np
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 
 from ReaderDAQ import * 
 from WriterDAQ import * 
@@ -20,15 +24,30 @@ from verifyModue import *
 
 from QRThread import * 
 from DataBaseClass import * 
-
+from OpenFilterJson import * 
 
 class MainWindow(QMainWindow): 
     def __init__(self): 
         super(MainWindow,self).__init__()
         loadUi("FrontPanel.ui",self)
+        
 
         self.setWindowTitle("Filter Tester")
-      
+
+        '''
+        Section to initialaize plot widget on main screen
+        '''
+
+        self.horizantalLayout = QHBoxLayout(self.plotFrame)
+        self.horizantalLayout.setObjectName('horizantalLayout')
+
+
+        self.figure = plt.figure()
+        self.canvas = FigureCanvas(self.figure)
+
+        self.horizantalLayout.addWidget(self.canvas)
+
+        
 
         '''
         Filter table initialozation
@@ -42,7 +61,18 @@ class MainWindow(QMainWindow):
         Prevnting from starting testing with no data
         '''
         self.testStartButton.setEnabled(False)
-       
+
+
+        '''
+        Initialaize test values
+        '''
+        self.AIsampleRate= None
+        self.AOsampleRate = None
+
+        self.AIsampleSize = None
+        self.AIsampleSize = None
+
+        self.frequency = None
 
         '''
         ComboBox values init
@@ -51,21 +81,23 @@ class MainWindow(QMainWindow):
         self.comboSetUpAI = None
         self.comboSetUpAO = None 
 
+        self.DAQsetButton.clicked.connect(self.daqSet)
+        self.cancelSetupButton.clicked.connect(self.cancelSetup)
+
         '''
         Variable for the filter boundries data
         '''
 
         self.filterBoundries = None
 
-        self.DAQsetButton.clicked.connect(self.daqSet)
-        self.cancelSetupButton.clicked.connect(self.cancelSetup)
+        
 
        
         '''
         QRcode reader section
         '''
         self.abortFlag = False #Flag to prevent the abort qr read error
-        print(self.abortFlag)
+       
         self.qrAcqButton.clicked.connect(self.QRFun)
         self.abortScanButton.clicked.connect(self.abortFun)
         
@@ -81,12 +113,49 @@ class MainWindow(QMainWindow):
         
         self.submitFilterButton.clicked.connect(lambda: self.dataBaseConnection(self.selectedFilterNumber))
 
+        '''
+        Test class and testing algorythm call
+        '''
+
+        self.testStartButton.clicked.connect(self.acquireTest)
 
 
         '''
         Close button event handling
         '''
         self.exitButton.clicked.connect(self.closeAppFun)
+
+    
+    '''
+    acquire signal and test section 
+    '''
+    def acquireTest(self): 
+
+        self.testStartButton.setEnabled(False)
+
+        self.acqAndTestThread = AcqAndTestThread(1, self.AISampleSize, self.AIsampleRate, 
+        self.AOsampleSize, self.AOsampleRate, self.frequency, self.filterBoundries, self.comboSetUpAO, self.comboSetUpAI)
+
+        self.acqAndTestThread.start()
+
+        self.acqAndTestThread.dampPoints.connect(self.updatePlot)
+        self.acqAndTestThread.testResult.connect(self.testResult)
+
+    def testResult(self, val): 
+
+        if val: 
+            self.testResultLabel.setText("Test Passed")
+        else: 
+            self.testResultLabel.setText("Test Failed")
+
+    def updatePlot(self, vals): 
+        
+        plt(self.frequency, vals)
+        plt.xscale('log')
+        plt.grid()
+        plt.draw()
+
+
 
     '''
     Daq setup functions section
@@ -131,6 +200,7 @@ class MainWindow(QMainWindow):
 
             self.QRThread.resutCheck(self.QRThread.data)
             self.filterBoundries = self.QRThread.openDBFiles(self.QRThread.fileName)
+            
 
             #self.resQRLabel.setText(self.QRThread.fileName)
     
@@ -167,6 +237,11 @@ class MainWindow(QMainWindow):
     def submitSelectedFilter(self): 
         
         self.selectedFilterNumber = self.filterFindCombobox.currentText()
+        openJson = OpenJsonFilter()
+
+        self.filterBoundries = openJson.openJson(self.selectedFilterNumber) #getting vals from json file - boundries
+        
+
         
     '''
     Database section - creating instace of an obj, 
@@ -187,6 +262,17 @@ class MainWindow(QMainWindow):
             self.filterTab.setItem(0, 0, QTableWidgetItem(self._dataBaseInst.dataDic["FilterID"]))
             self.filterTab.setItem(0, 1, QTableWidgetItem(self._dataBaseInst.dataDic["Type"]))
             self.filterTab.setItem(0, 2, QTableWidgetItem(self._dataBaseInst.dataDic["DampInfo"]))
+            self.testStartButton.setEnabled(True)
+
+            self.AIsampleRate = [int(i) for i in self.selectedFilterDic['AISampleRate'].split(',')]
+            self.AISampleSize = int(self.selectedFilterDic['AISampleSize'])
+
+            self.AOsampleRate = [int(i) for i in self.selectedFilterDic['AOSampleRate'].split(',')]
+            self.AOsampleSize = int(self.selectedFilterDic['AOSampleSize'])
+
+            self.frequency = [int(i) for i in self.selectedFilterDic['Frequency'].split(',')]
+
+            
         else: 
             return 0 
         
@@ -235,15 +321,27 @@ class MainWindow(QMainWindow):
 '''
 Data acqusition and test sequence thread class
 '''
-class acqAndTestThread(QtCore.QThread): 
+class AcqAndTestThread(QtCore.QThread): 
 
-    def __init__(self, amp, sampleSize, sampleRate, frequency):
+    dampPoints = pyqtSignal(list)
+    testResult = pyqtSignal(bool)
+
+    def __init__(self, amp, sampleSizeAI, sampleRateAI, sampleSizeAO, sampleRateAO, frequency, damps, AOSetup, AISetup):
         super().__init__() 
 
         self.amplitude = amp
-        self.sampleSize = sampleSize
-        self.sampleRate = sampleRate
+        self.sampleSizeAI = sampleSizeAI
+        self.sampleRateAI = sampleRateAI
+
+        #self.sampleSizeAO = sampleSizeAO
+        self.sampleSizeAO = [1000] * 41 #Eozwiązanie tymczasowe 
+        self.sampleRateAO = sampleRateAO
+
         self.freq = frequency
+        self.damps = damps
+
+        self.AOSetup = AOSetup
+        self.AISetup = AISetup
 
         self.q = queue.Queue()
         self.qAmps = queue.Queue()
@@ -251,7 +349,61 @@ class acqAndTestThread(QtCore.QThread):
         self.yVals = list() 
         self.peaksVals = list()
 
+        self.dampTest = VerifyModule(damps)
 
+        self.signalGen = SignalWriter(amp, sampleSizeAI, self.AOSetup) #Sample generowane 200
+        self.signalRead = SignalReader(self.AISetup) #Zmieniony został atrybut sampleSize na dynamiczny
+
+  
+    def run(self): 
+
+        for f, sr, sSize in zip (self.freq, self.sampleRateAI, self.sampleSizeAO): 
+
+            self.signalGen.createTask(f, sr)
+               
+            self.signalRead.create_task(sr,sSize)
+
+            self.signalGen.endGen()
+
+            '''
+            Poprawna akwizycja i obliczanie amplitud syg. dla 
+            danej częstotliwości
+
+            '''
+            np_fft = np.fft.fft(self.signalRead.dataContainer[200:])
+            amplitudes = (np.abs(np_fft) / sSize) 
+            aPlot = 2 * amplitudes[0:int(sSize/2 + 1)]
+        
+            peak = find_peaks(aPlot, height=0)
+            heights = peak[1]['peak_heights']
+            maxVals = list(map(float, heights))
+
+
+            curAmp = np.amax(maxVals)
+            self.qAmps.put(curAmp)
+
+        
+        '''
+        Kolejkowanie otrzymanych wartości amplitud
+        '''
+        while not self.qAmps.empty(): 
+
+            self.peaksVals.append(self.qAmps.get())
+
+        results = queue.Queue()   
+        for a in self.amps: 
+            v = 20*(np.log10(a))
+            results.put(v)
+
+        self.finalList = list()
+        while not results.empty():
+            self.finalList.append(results.get())
+
+        #Wywołanie funkcji sprawdzającej porawność testu dla danego filtra
+        #self.dampTest.verFun(self.finalList,self.freq)
+
+        self.dampPoints.emit(self.finalList)
+        self.testResult.emit(self.dampTest.verFun(self.finalList,self.freq))
 
 
 if __name__ == "__main__": 
