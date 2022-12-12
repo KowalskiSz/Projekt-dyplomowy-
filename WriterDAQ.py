@@ -23,7 +23,6 @@ class SignalWriter():
         
         self.amplitude = amplitude
         self.sampleSize = sampleSize
-        
 
         self.frequency = 0
         self.sampleRate = 0
@@ -67,8 +66,11 @@ class SignalWriter():
 
         try: 
             self.task = nidaqmx.Task()
+        
         except OSError:
             print("DAQ is not connected, task could not be created")
+            self.isConnented = False
+
             return 
 
         self.task.ao_channels.add_ao_voltage_chan(self.daqSetup , max_val=5, min_val=-5)

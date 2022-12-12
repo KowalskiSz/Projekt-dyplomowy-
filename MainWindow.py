@@ -47,7 +47,7 @@ class MainWindow(QMainWindow):
 
         self.horizantalLayout.addWidget(self.canvas)
 
-        
+
 
         '''
         Filter table initialozation
@@ -97,6 +97,10 @@ class MainWindow(QMainWindow):
         '''
         self.okTestButton.clicked.connect(self.okButtonFun)
 
+        '''
+        progress bar initialization
+        '''
+        
         
 
        
@@ -147,6 +151,7 @@ class MainWindow(QMainWindow):
 
         self.acqAndTestThread.dampPoints.connect(self.updatePlot)
         self.acqAndTestThread.testResult.connect(self.testResult)
+        self.acqAndTestThread.updateProgressBar.connect(self.updateProressBar)
 
     def testResult(self, val): 
 
@@ -166,6 +171,12 @@ class MainWindow(QMainWindow):
     def okButtonFun(self): 
 
         self.figure.clear()
+        self.testResultLabel.clear()
+        
+
+    def updateProressBar(self, val): 
+        
+        self.progressBar.setValue(val)
 
 
 
@@ -342,6 +353,7 @@ class AcqAndTestThread(QtCore.QThread):
 
     dampPoints = pyqtSignal(list)
     testResult = pyqtSignal(bool)
+    updateProgressBar = pyqtSignal(int)
 
     def __init__(self, amp, sampleSizeAI, sampleRateAI, sampleSizeAO, sampleRateAO, frequency, damps, AOSetup, AISetup):
         super().__init__() 
@@ -359,6 +371,8 @@ class AcqAndTestThread(QtCore.QThread):
 
         self.AOSetup = AOSetup
         self.AISetup = AISetup
+
+        self.progressVal = 0 
 
         self.q = queue.Queue()
         self.qAmps = queue.Queue()
@@ -387,7 +401,7 @@ class AcqAndTestThread(QtCore.QThread):
             danej częstotliwości
 
             '''
-            np_fft = np.fft.fft(self.signalRead.dataContainer[200:])
+            np_fft = np.fft.fft(self.signalRead.dataContainer[100:])
             amplitudes = (np.abs(np_fft) / sSize) 
             aPlot = 2 * amplitudes[0:int(sSize/2 + 1)]
         
@@ -421,6 +435,9 @@ class AcqAndTestThread(QtCore.QThread):
 
         self.dampPoints.emit(self.finalList)
         self.testResult.emit(self.resDamp)
+        self.updateProgressBar.emit(self.progressVal)
+
+        self.progressVal = self.progressVal + 1 
 
 
 if __name__ == "__main__": 
