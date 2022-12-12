@@ -61,6 +61,8 @@ class MainWindow(QMainWindow):
         Prevnting from starting testing with no data
         '''
         self.testStartButton.setEnabled(False)
+        self.submitFilterButton.setEnabled(False)
+        self.qrAcqButton.setEnabled(False)
 
 
         '''
@@ -89,6 +91,11 @@ class MainWindow(QMainWindow):
         '''
 
         self.filterBoundries = None
+
+        '''
+        Ok button
+        '''
+        self.okTestButton.clicked.connect(self.okButtonFun)
 
         
 
@@ -143,17 +150,23 @@ class MainWindow(QMainWindow):
 
     def testResult(self, val): 
 
-        if val: 
+        if val == True: 
             self.testResultLabel.setText("Test Passed")
         else: 
             self.testResultLabel.setText("Test Failed")
 
     def updatePlot(self, vals): 
         
-        plt(self.frequency, vals)
+        self.figure.clear()
+        plt.plot(self.frequency, vals)
         plt.xscale('log')
         plt.grid()
-        plt.draw()
+        self.canvas.draw()
+
+    def okButtonFun(self): 
+
+        self.figure.clear()
+
 
 
 
@@ -166,6 +179,8 @@ class MainWindow(QMainWindow):
         self.comboSetUpAO = self.comboBoxAO.currentText()
 
         self.DAQsetButton.setEnabled(False)
+        self.submitFilterButton.setEnabled(True)
+        self.qrAcqButton.setEnabled(True)
 
 
     def cancelSetup(self): 
@@ -173,6 +188,8 @@ class MainWindow(QMainWindow):
         self.comboSetUpAI = None
         self.comboSetUpAO = None 
         self.DAQsetButton.setEnabled(True)
+        self.submitFilterButton.setEnabled(False)
+        
 
     '''
     QRCode reader section
@@ -391,7 +408,7 @@ class AcqAndTestThread(QtCore.QThread):
             self.peaksVals.append(self.qAmps.get())
 
         results = queue.Queue()   
-        for a in self.amps: 
+        for a in self.peaksVals: 
             v = 20*(np.log10(a))
             results.put(v)
 
@@ -400,10 +417,10 @@ class AcqAndTestThread(QtCore.QThread):
             self.finalList.append(results.get())
 
         #Wywołanie funkcji sprawdzającej porawność testu dla danego filtra
-        #self.dampTest.verFun(self.finalList,self.freq)
+        self.resDamp = self.dampTest.verFun(self.finalList,self.freq)
 
         self.dampPoints.emit(self.finalList)
-        self.testResult.emit(self.dampTest.verFun(self.finalList,self.freq))
+        self.testResult.emit(self.resDamp)
 
 
 if __name__ == "__main__": 
