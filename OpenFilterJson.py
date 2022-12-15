@@ -31,4 +31,7 @@ class OpenJsonFilter():
 # if __name__ == "__main__":
 
 #     x = OpenJsonFilter()
-#     print(x.openJson('000001'))
+#     l = x.openJson('000001')
+#     print(l[:,0])
+#     print(l[:,1])
+#     print(l[:,2])

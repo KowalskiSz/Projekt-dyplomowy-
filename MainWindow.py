@@ -25,6 +25,8 @@ from verifyModue import *
 from QRThread import * 
 from DataBaseClass import * 
 from OpenFilterJson import * 
+from Tdmscreator import * 
+
 
 class MainWindow(QMainWindow): 
     def __init__(self): 
@@ -63,7 +65,8 @@ class MainWindow(QMainWindow):
         self.testStartButton.setEnabled(False)
         self.submitFilterButton.setEnabled(False)
         self.qrAcqButton.setEnabled(False)
-
+        self.createtdmsButton.setEnabled(False)
+        self.abortScanButton.setEnabled(False)
 
         '''
         Initialaize test values
@@ -75,6 +78,10 @@ class MainWindow(QMainWindow):
         self.AIsampleSize = None
 
         self.frequency = None
+        self.finalDamps = None
+
+        #Test variable used for tdms write
+        self.testOutput = None
 
         '''
         ComboBox values init
@@ -98,10 +105,16 @@ class MainWindow(QMainWindow):
         self.okTestButton.clicked.connect(self.okButtonFun)
 
         '''
+        Generating tdms file button
+        '''
+
+        self.createtdmsButton.clicked.connect(self.createtdmsFile)
+
+        '''
         progress bar initialization
         '''
         
-        
+        self.progressBar.reset()
 
        
         '''
@@ -168,10 +181,16 @@ class MainWindow(QMainWindow):
         plt.grid()
         self.canvas.draw()
 
+        '''
+        Updating final damps values
+        '''
+        self.finalDamps = vals
+
     def okButtonFun(self): 
 
         self.figure.clear()
         self.testResultLabel.clear()
+        self.createtdmsButton.setEnabled(True)
         
 
     def updateProressBar(self, val): 
@@ -192,6 +211,7 @@ class MainWindow(QMainWindow):
         self.DAQsetButton.setEnabled(False)
         self.submitFilterButton.setEnabled(True)
         self.qrAcqButton.setEnabled(True)
+        self.abortScanButton.setEnabled(True)
 
 
     def cancelSetup(self): 
@@ -323,7 +343,28 @@ class MainWindow(QMainWindow):
     '''
     Database and table section
     '''
+
+    '''
+    Creating tdms file section 
+    '''
         
+    def createtdmsFile(self): 
+
+        self._tdmsCreatorObject = Tdmscreator(self.frequency, self.finalDamps, self.selectedFilterDic["FilterID"], self.selectedFilterDic["Type"], 
+        self.selectedFilterDic["DampInfo"], self.testOutput, self.filterBoundries[:,0], self.filterBoundries[:,1], self.filterBoundries[:,2])
+
+        self._tdmsCreatorObject.createFile()
+
+        msgg = QMessageBox()
+        msgg.setIcon(QMessageBox.Information)
+        
+        msgg.setWindowTitle("File generated")
+        msgg.setText(f"You file has been generated!")
+        
+        msgg.setStandardButtons(QMessageBox.Ok)
+
+        msgg.exec_()
+
 
 
 
@@ -433,6 +474,7 @@ class AcqAndTestThread(QtCore.QThread):
         #Wywołanie funkcji sprawdzającej porawność testu dla danego filtra
         self.resDamp = self.dampTest.verFun(self.finalList,self.freq)
 
+
         self.dampPoints.emit(self.finalList)
         self.testResult.emit(self.resDamp)
         self.updateProgressBar.emit(self.progressVal)
@@ -446,8 +488,8 @@ if __name__ == "__main__":
     mainWidndow = MainWindow()
   
 
-    mainWidndow.setFixedWidth(1300)
-    mainWidndow.setFixedHeight(900)
+    #mainWidndow.setFixedWidth(1565)
+    #mainWidndow.setFixedHeight(900)
     mainWidndow.show()
 
     sys.exit(app.exec_())
