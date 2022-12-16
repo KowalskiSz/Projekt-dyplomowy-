@@ -159,12 +159,14 @@ class MainWindow(QMainWindow):
 
         self.acqAndTestThread = AcqAndTestThread(1, self.AISampleSize, self.AIsampleRate, 
         self.AOsampleSize, self.AOsampleRate, self.frequency, self.filterBoundries, self.comboSetUpAO, self.comboSetUpAI)
+        self.progressBar.setRange(0, len(self.frequency))
 
         self.acqAndTestThread.start()
 
         self.acqAndTestThread.dampPoints.connect(self.updatePlot)
         self.acqAndTestThread.testResult.connect(self.testResult)
         self.acqAndTestThread.updateProgressBar.connect(self.updateProressBar)
+        self.acqAndTestThread.finished.connect(self.popUpMessageTest)
 
     def testResult(self, val): 
 
@@ -175,10 +177,13 @@ class MainWindow(QMainWindow):
 
     def updatePlot(self, vals): 
         
-        self.figure.clear()
-        plt.plot(self.frequency, vals)
+        #self.figure.clear()
+        plt.plot(self.frequency, vals, label="Damping plot" )
+        plt.plot(self.filterBoundries[:,0], self.filterBoundries[:,1], label="High limit")
+        plt.plot(self.filterBoundries[:,0], self.filterBoundries[:,2], label="Low limit")
         plt.xscale('log')
         plt.grid()
+        plt.legend()
         self.canvas.draw()
 
         '''
@@ -186,11 +191,23 @@ class MainWindow(QMainWindow):
         '''
         self.finalDamps = vals
 
+    def popUpMessageTest(self):
+        msg = QMessageBox()
+        msg.setWindowTitle("Testing complited!")
+        msg.setText("Testing done!")
+        msg.setIcon(QMessageBox.Information)
+        msg.setStandardButtons(QMessageBox.Ok)
+
+        x = msg.exec_()
+        
+
     def okButtonFun(self): 
 
-        self.figure.clear()
+        self.figure.clear(True)
+        
         self.testResultLabel.clear()
         self.createtdmsButton.setEnabled(True)
+        self.progressBar.reset()
         
 
     def updateProressBar(self, val): 
@@ -288,6 +305,7 @@ class MainWindow(QMainWindow):
         openJson = OpenJsonFilter()
 
         self.filterBoundries = openJson.openJson(self.selectedFilterNumber) #getting vals from json file - boundries
+        
         
 
         
@@ -421,9 +439,9 @@ class AcqAndTestThread(QtCore.QThread):
         self.yVals = list() 
         self.peaksVals = list()
 
-        self.dampTest = VerifyModule(damps)
+        self.dampTest = VerifyModule(self.damps)
 
-        self.signalGen = SignalWriter(amp, sampleSizeAI, self.AOSetup) #Sample generowane 200
+        self.signalGen = SignalWriter(self.amplitude, sampleSizeAI, self.AOSetup) #Sample generowane 200
         self.signalRead = SignalReader(self.AISetup) #Zmieniony został atrybut sampleSize na dynamiczny
 
   
@@ -431,11 +449,17 @@ class AcqAndTestThread(QtCore.QThread):
 
         for f, sr, sSize in zip (self.freq, self.sampleRateAI, self.sampleSizeAO): 
 
+            self.progressVal = self.progressVal + 1
+            self.updateProgressBar.emit(self.progressVal)
+
             self.signalGen.createTask(f, sr)
                
             self.signalRead.create_task(sr,sSize)
 
             self.signalGen.endGen()
+
+            
+            
 
             '''
             Poprawna akwizycja i obliczanie amplitud syg. dla 
@@ -454,6 +478,10 @@ class AcqAndTestThread(QtCore.QThread):
             curAmp = np.amax(maxVals)
             self.qAmps.put(curAmp)
 
+            
+
+
+
         
         '''
         Kolejkowanie otrzymanych wartości amplitud
@@ -467,7 +495,7 @@ class AcqAndTestThread(QtCore.QThread):
             v = 20*(np.log10(a))
             results.put(v)
 
-        self.finalList = list()
+        self.finalList = []
         while not results.empty():
             self.finalList.append(results.get())
 
@@ -477,9 +505,11 @@ class AcqAndTestThread(QtCore.QThread):
 
         self.dampPoints.emit(self.finalList)
         self.testResult.emit(self.resDamp)
-        self.updateProgressBar.emit(self.progressVal)
 
-        self.progressVal = self.progressVal + 1 
+        
+    
+
+        
 
 
 if __name__ == "__main__": 

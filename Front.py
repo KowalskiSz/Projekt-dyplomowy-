@@ -154,8 +154,8 @@ class Ui_MainWindow(object):
         self.testAcqButton.setEnabled(True)
         #QtWidgets.QMessageBox.information(self, "Done", "Acqusition completed") 
         msg = QMessageBox()
-        msg.setWindowTitle("Acqusition")
-        msg.setText("Acqusition done!")
+        msg.setWindowTitle("Testing complited!")
+        msg.setText("Testing done!")
         msg.setIcon(QMessageBox.Information)
         msg.setStandardButtons(QMessageBox.Ok)
 

@@ -55,7 +55,7 @@ frefLow1st = np.array([[1, 5, -5],[30, 5, -5],[40, 4, -6],[50, 1, -9],[100,-2,-1
 frefLow2st = np.array([[1, 5, -5],[30, 4, -6],[40, 3, -8],[50, 1, -10],[100,-5,-25],[1000,-25,-75],[10000,-45,-125],[25000,-53,-145]])
 frefHigh1st = np.array([[1, -16, -60],[50, 1, -9],[100, 4, -6],[1000, 5, -5],[10000,5,-5],[25000,5,-5]])
 frefHigh2st = np.array([[1, -33, -96],[50, 1, -10],[100, 3, -8],[1000, 5, -5],[10000,5,-5],[25000,5,-5]])
-frefBandStop2st = np.array([[1, -5, -5],[10, 1, -10],[30, 0, -50],[90, -20, -50],[300,1,-50],[700,5,-50],[1000,5,-10],[10000,5,-5],[25000,5,-5]])
+frefBandStop2st = np.array([[1, 5, -5],[10, 1, -10],[30, 0, -50],[90, -20, -50],[300,1,-50],[700,5,-50],[1000,5,-10],[10000,5,-5],[25000,5,-5]])
 frefBandStop1st = np.array([[1, -5, -5],[10, 1, -10],[30, 0, -40],[90, -20, -40],[300,1,-40],[700,5,-40],[1000,5,-10],[10000,5,-5],[25000,5,-5]])
 frefBandPass1st = np.array([[1, -16, -61],[50, 1, -10],[235, 1, -10],[1000, -5, -29],[10000,-15,-59],[25000,-19,-71]])
 frefBandPass2st = np.array([[1, -33, -100],[50, 1, -15],[235, 1, -15],[1000, -14, -47],[10000,-34,-97],[25000,-41,-116]])
@@ -70,7 +70,7 @@ peaksVals = list()
 
 signalGen = SignalWriter(amplitude, 200, 'Dev1/ao0') #Sample generowane 200
 signalRead = SignalReader('Dev1/ai0') #Zmieniony został atrybut sampleSize na dynamiczny 
-dampTest = VerifyModule(frefLow1st)
+dampTest = VerifyModule(frefLow2st)
 
 for f, sr, sSize in zip (freq, sampleRate, sampleSize): 
 
