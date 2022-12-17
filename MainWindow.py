@@ -178,7 +178,7 @@ class MainWindow(QMainWindow):
     def updatePlot(self, vals): 
         
         #self.figure.clear()
-        plt.plot(self.frequency, vals, label="Damping plot" )
+        plt.plot(self.frequency[:-1], vals[:-1], label="Damping plot" )
         plt.plot(self.filterBoundries[:,0], self.filterBoundries[:,1], label="High limit")
         plt.plot(self.filterBoundries[:,0], self.filterBoundries[:,2], label="Low limit")
         plt.xscale('log')
@@ -435,6 +435,7 @@ class AcqAndTestThread(QtCore.QThread):
 
         self.q = queue.Queue()
         self.qAmps = queue.Queue()
+        
 
         self.yVals = list() 
         self.peaksVals = list()
@@ -444,7 +445,16 @@ class AcqAndTestThread(QtCore.QThread):
         self.signalGen = SignalWriter(self.amplitude, sampleSizeAI, self.AOSetup) #Sample generowane 200
         self.signalRead = SignalReader(self.AISetup) #Zmieniony został atrybut sampleSize na dynamiczny
 
-  
+    
+    def dampingCount(self, amps):
+         
+        for a in amps: 
+            v = 20*(np.log10(a))
+        
+        self.results.put(v)
+
+        return self.results
+
     def run(self): 
 
         for f, sr, sSize in zip (self.freq, self.sampleRateAI, self.sampleSizeAO): 
@@ -490,14 +500,16 @@ class AcqAndTestThread(QtCore.QThread):
 
             self.peaksVals.append(self.qAmps.get())
 
-        results = queue.Queue()   
-        for a in self.peaksVals: 
-            v = 20*(np.log10(a))
-            results.put(v)
+        # results = queue.Queue()   
+        # for a in self.peaksVals: 
+        #     v = 20*(np.log10(a))
+        #     results.put(v)
+        self.results = queue.Queue()
+        res = self.dampingCount(self.peaksVals)
 
         self.finalList = []
-        while not results.empty():
-            self.finalList.append(results.get())
+        while not res.empty():
+            self.finalList.append(res.get())
 
         #Wywołanie funkcji sprawdzającej porawność testu dla danego filtra
         self.resDamp = self.dampTest.verFun(self.finalList,self.freq)
