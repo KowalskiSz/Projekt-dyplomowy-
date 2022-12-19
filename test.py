@@ -148,12 +148,17 @@ def dampingCount(amps):
 
 res = dampingCount(peaksVals)
 
+
 finalList = list()
 while not res.empty():
+
     finalList.append(res.get())
 
 #Wywołanie funkcji sprawdzającej porawność testu dla danego filtra
+
+#print(dampTest.arrayOfVals)
 print(dampTest.verFun(finalList,freq))
+
 
 
 plt.plot(freq[:-1],finalList[:-1])

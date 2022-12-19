@@ -3,14 +3,17 @@ import numpy as np
 class VerifyModule(): 
 
     def __init__(self, filterList):
+        
 
         self.filterList = filterList #Potraktujmy to jak matrix NxM
-        self.damp = None
-        self.frequency = None
+        # self.damp = None
+        # self.frequency = None
         self.result = False
         self.counter = 0
 
-        self.rowAndCols = None
+        self.outList = list()
+
+        #self.rowAndCols = None
         self.rowAndCols = np.shape(self.filterList)
         self.arrayOfVals = np.zeros(shape=self.rowAndCols[0], dtype=np.int8)
         #print(self.filterList) 
@@ -19,43 +22,51 @@ class VerifyModule():
     def verFun(self, damps, frequency):
         
         self.counter = 0
-        self.damps = damps
-        self.frequency = frequency
-        #print(len(frequency))
-        for i in range(len(self.frequency)):
+        # self.damps = damps
+        # self.frequency = frequency
+        #print((frequency))
+        #print(damps)
+
+        
+        for i in range(len(frequency)):
         #for freq, damp in zip(frequency, damps): 
+            
             if self.counter < self.rowAndCols[0]:
-
-
-                if (self.frequency[i] == self.filterList[self.counter,0]).any(): 
+                
+                
+                if (frequency[i] == self.filterList[self.counter,0]).any():
                     
-                    if self.damps[i] <= self.filterList[self.counter,1] and self.damps[i] >= self.filterList[self.counter,2]: 
+                    
+                    
+                    if damps[i] <= self.filterList[self.counter,1] and damps[i] >= self.filterList[self.counter,2]: 
                        
                         self.arrayOfVals[self.counter] = 1
                         self.counter = self.counter + 1
-                        #print(f'{self.damps[i]}, {self.frequency[i]}')
-                        #print(i)
-                    
+                        #print(f'{damps[i]}, {frequency[i]}')
+                        self.outList.append([damps[i], frequency[i]])
                         
-                    else:
+                    else: 
 
                         self.arrayOfVals[self.counter] = 0
                         self.counter = self.counter + 1
-                        #print(f'{self.damps[i]}, {self.frequency[i]}')
-                        #print(i)
+                        #print(f'{damps[i]}, {frequency[i]}')
+                        self.outList.append([damps[i], frequency[i]])
+                        
                 else: 
                     
                     continue
+                    
         
-        if np.all((self.arrayOfVals == 0)):
-            self.result = False
-        else:    
-            self.result = np.max(self.arrayOfVals) == np.min(self.arrayOfVals)
         
         print(self.arrayOfVals)
+        if np.all((self.arrayOfVals == 0)):
+            result = False
+        else:    
+            result = np.max(self.arrayOfVals) == np.min(self.arrayOfVals)
+        
         
 
-        return self.result
+        return result, self.outList
 
 
 # if __name__ == "__main__":

@@ -56,9 +56,17 @@ class MainWindow(QMainWindow):
         '''
         self.filterTab.setColumnWidth(0,80)
         self.filterTab.setColumnWidth(1,150)
-        self.filterTab.setColumnWidth(2,120)
+        self.filterTab.setColumnWidth(2,150)
 
         self.filterTab.setLineWidth(20)
+
+        '''
+        Damps and frequency table
+        '''
+        self.dampsTable.setColumnWidth(0,120)
+        self.dampsTable.setColumnWidth(1,120)
+        self.dampsTable.setLineWidth(20)
+
         '''
         Prevnting from starting testing with no data
         '''
@@ -98,6 +106,7 @@ class MainWindow(QMainWindow):
         '''
 
         self.filterBoundries = None
+        self.dampPoints = None
 
         '''
         Ok button
@@ -164,13 +173,30 @@ class MainWindow(QMainWindow):
         self.acqAndTestThread.start()
 
         self.acqAndTestThread.dampPoints.connect(self.updatePlot)
-        self.acqAndTestThread.testResult.connect(self.testResult)
+        self.acqAndTestThread.finished.connect(self.testResult)
         self.acqAndTestThread.updateProgressBar.connect(self.updateProressBar)
         self.acqAndTestThread.finished.connect(self.popUpMessageTest)
 
-    def testResult(self, val): 
+    def testResult(self): 
 
-        if val == True: 
+        self.verObj = VerifyModule(self.filterBoundries)
+        testResult, outList = self.verObj.verFun(self.dampPoints, self.frequency)
+        
+        
+        self.dampsTable.setRowCount(len(outList))
+        self.dampsTable.setColumnCount(2)
+
+
+        for i in range(len(outList)): 
+            
+            dV = str(outList[i][0])
+            fV = str(outList[i][1])
+            self.dampsTable.setItem(i,0, QTableWidgetItem(dV))
+            self.dampsTable.setItem(i,1, QTableWidgetItem(fV))
+            #print(outList[i][0])
+            
+
+        if testResult == True: 
             self.testResultLabel.setText("Test Passed")
         else: 
             self.testResultLabel.setText("Test Failed")
@@ -178,7 +204,8 @@ class MainWindow(QMainWindow):
     def updatePlot(self, vals): 
         
         #self.figure.clear()
-        plt.plot(self.frequency[:-1], vals[:-1], label="Damping plot" )
+        self.dampPoints = vals
+        plt.plot(self.frequency, vals, label="Damping plot" )
         plt.plot(self.filterBoundries[:,0], self.filterBoundries[:,1], label="High limit")
         plt.plot(self.filterBoundries[:,0], self.filterBoundries[:,2], label="Low limit")
         plt.xscale('log')
@@ -203,11 +230,14 @@ class MainWindow(QMainWindow):
 
     def okButtonFun(self): 
 
-        self.figure.clear(True)
+        plt.plot(0,0)
+        self.canvas.draw()
         
         self.testResultLabel.clear()
         self.createtdmsButton.setEnabled(True)
         self.progressBar.reset()
+
+        self.dampsTable.clear()
         
 
     def updateProressBar(self, val): 
@@ -416,6 +446,8 @@ class AcqAndTestThread(QtCore.QThread):
 
     def __init__(self, amp, sampleSizeAI, sampleRateAI, sampleSizeAO, sampleRateAO, frequency, damps, AOSetup, AISetup):
         super().__init__() 
+        
+
 
         self.amplitude = amp
         self.sampleSizeAI = sampleSizeAI
@@ -433,6 +465,7 @@ class AcqAndTestThread(QtCore.QThread):
 
         self.progressVal = 0 
 
+
         self.q = queue.Queue()
         self.qAmps = queue.Queue()
         
@@ -440,7 +473,10 @@ class AcqAndTestThread(QtCore.QThread):
         self.yVals = list() 
         self.peaksVals = list()
 
-        self.dampTest = VerifyModule(self.damps)
+        #self.dampTest = VerifyModule(self.damps)
+
+        
+        
 
         self.signalGen = SignalWriter(self.amplitude, sampleSizeAI, self.AOSetup) #Sample generowane 200
         self.signalRead = SignalReader(self.AISetup) #Zmieniony został atrybut sampleSize na dynamiczny
@@ -450,8 +486,7 @@ class AcqAndTestThread(QtCore.QThread):
          
         for a in amps: 
             v = 20*(np.log10(a))
-        
-        self.results.put(v)
+            self.results.put(v)
 
         return self.results
 
@@ -476,7 +511,7 @@ class AcqAndTestThread(QtCore.QThread):
             danej częstotliwości
 
             '''
-            np_fft = np.fft.fft(self.signalRead.dataContainer[100:])
+            np_fft = np.fft.fft(self.signalRead.dataContainer[200:])
             amplitudes = (np.abs(np_fft) / sSize) 
             aPlot = 2 * amplitudes[0:int(sSize/2 + 1)]
         
@@ -489,9 +524,6 @@ class AcqAndTestThread(QtCore.QThread):
             self.qAmps.put(curAmp)
 
             
-
-
-
         
         '''
         Kolejkowanie otrzymanych wartości amplitud
@@ -505,22 +537,17 @@ class AcqAndTestThread(QtCore.QThread):
         #     v = 20*(np.log10(a))
         #     results.put(v)
         self.results = queue.Queue()
-        res = self.dampingCount(self.peaksVals)
+        self.res = self.dampingCount(self.peaksVals)
+
+       
 
         self.finalList = []
-        while not res.empty():
-            self.finalList.append(res.get())
-
-        #Wywołanie funkcji sprawdzającej porawność testu dla danego filtra
-        self.resDamp = self.dampTest.verFun(self.finalList,self.freq)
-
+        while not self.res.empty():
+            
+            self.finalList.append(self.res.get())
 
         self.dampPoints.emit(self.finalList)
-        self.testResult.emit(self.resDamp)
-
         
-    
-
         
 
 

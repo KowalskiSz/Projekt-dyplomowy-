@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1565</width>
+    <width>1808</width>
     <height>880</height>
    </rect>
   </property>
@@ -703,8 +703,8 @@ QPushButton:active {
      <rect>
       <x>430</x>
       <y>320</y>
-      <width>911</width>
-      <height>391</height>
+      <width>931</width>
+      <height>421</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -762,6 +762,26 @@ QPushButton:active {
       <string>Generate</string>
      </property>
     </widget>
+   </widget>
+   <widget class="QTableWidget" name="dampsTable">
+    <property name="geometry">
+     <rect>
+      <x>1370</x>
+      <y>320</y>
+      <width>251</width>
+      <height>351</height>
+     </rect>
+    </property>
+    <column>
+     <property name="text">
+      <string>Frequency [Hz]</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Damping [dB]</string>
+     </property>
+    </column>
    </widget>
   </widget>
  </widget>
