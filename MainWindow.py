@@ -207,10 +207,12 @@ class MainWindow(QMainWindow):
         self.dampPoints = vals
         plt.plot(self.frequency, vals, label="Damping plot" )
         plt.plot(self.filterBoundries[:,0], self.filterBoundries[:,1], '--', label="High limit")
-        
         plt.plot(self.filterBoundries[:,0], self.filterBoundries[:,2], '--', label="Low limit")
+        #plt.axvline(x = , color = 'b', label = 'cutoff')
+        
         plt.xscale('log')
-        plt.grid()
+        plt.set_facecolor('#EBEBEB')
+        plt.grid(color="red", linewidth=0.7)
         plt.legend()
         self.canvas.draw()
 
@@ -231,7 +233,7 @@ class MainWindow(QMainWindow):
 
     def okButtonFun(self): 
 
-        plt.plot(0,0)
+        plt.plot([0],[0])
         self.canvas.draw()
         
         self.testResultLabel.clear()
@@ -283,8 +285,8 @@ class MainWindow(QMainWindow):
         #self.camQR.clear()
         #self.resQRLabel.clear()
         self.QRThread.ImageUpdate.connect(self.imageUpdateSlot)
-        self.QRThread.finished.connect(self.popUpQRMessage)
-        self.QRThread.finished.connect(lambda: self.dataBaseConnection(self.QRThread.data))
+        #self.QRThread.finished.connect(self.popUpQRMessage)
+        #self.QRThread.finished.connect(lambda: self.dataBaseConnection(self.QRThread.data))
 
     def imageUpdateSlot(self, image): 
 
@@ -293,21 +295,29 @@ class MainWindow(QMainWindow):
         if self.QRThread.flag == True: 
             
             QTimer.singleShot(1000, self.clearLabel)
-
             self.QRThread.resutCheck(self.QRThread.data)
-            self.filterBoundries = self.QRThread.openDBFiles(self.QRThread.fileName)
-            
+
+            if self.QRThread.fileName != 0:
+                
+                self.dataBaseConnection(self.QRThread.data)
+                self.filterBoundries = self.QRThread.openDBFiles(self.QRThread.fileName)
+                self.popUpQRMessage(self.QRThread.data)
+            else:
+
+                self.abortFlag == True
+                self.popUpQRMessage("No in data base")
+                   
 
             #self.resQRLabel.setText(self.QRThread.fileName)
     
-    def popUpQRMessage(self): 
+    def popUpQRMessage(self, number): 
         
         #QtWidgets.QMessageBox.information(self, "Done", "Acqusition completed") 
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Question)
         
         msg.setWindowTitle("Filter Chosen")
-        msg.setText(f"You have chosen filter number: {self.QRThread.data}")
+        msg.setText(f"You have chosen filter number: {number}")
         
         msg.setStandardButtons(QMessageBox.Ok)
 
@@ -475,11 +485,7 @@ class AcqAndTestThread(QtCore.QThread):
         self.yVals = list() 
         self.peaksVals = list()
 
-        #self.dampTest = VerifyModule(self.damps)
-
         
-        
-
         self.signalGen = SignalWriter(self.amplitude, sampleSizeAI, self.AOSetup) #Sample generowane 200
         self.signalRead = SignalReader(self.AISetup) #Zmieniony został atrybut sampleSize na dynamiczny
 
@@ -493,7 +499,7 @@ class AcqAndTestThread(QtCore.QThread):
         return self.results
 
     def run(self): 
-
+        
         for f, sr, sSize in zip (self.freq, self.sampleRateAI, self.sampleSizeAO): 
 
             self.progressVal = self.progressVal + 1

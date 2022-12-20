@@ -29,11 +29,10 @@ class SignalWriter():
         #self.xtimes = 0 
         #self.overAllBuf = np.empty(shape=(200,1))
 
-
+        self.isConnented = None
         #self.wave_gen = WaveGeneration()
         #self.wave_gen = SinGenAnt()
         self.wave_gen = SinGen()
-
         self.daqSetup = daqSetup
         
 

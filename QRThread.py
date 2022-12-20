@@ -97,10 +97,10 @@ class QRThread(QThread):
                     #return self.fileName
                 else: 
                     continue
+                    
 
             if self.fileName == None: 
-
-                print("Such filter does not exists")
+                self.fileName = 0
     '''
     Tymczasowa funkcja przetwarzająca zczytany wynik 
     z kodu QR
@@ -125,7 +125,7 @@ class QRThread(QThread):
                 
                 listOfElements.append(line.split())
             
-            self.outputArray = np.asarray(listOfElements, dtype=int)
+            self.outputArray = np.asarray(listOfElements, dtype=float)
             
         
             return self.outputArray 
