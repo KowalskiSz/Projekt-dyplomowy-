@@ -444,7 +444,7 @@
       <x>300</x>
       <y>20</y>
       <width>421</width>
-      <height>211</height>
+      <height>241</height>
      </rect>
     </property>
     <widget class="QTableWidget" name="filterTab">
@@ -455,8 +455,8 @@
       <rect>
        <x>0</x>
        <y>80</y>
-       <width>411</width>
-       <height>61</height>
+       <width>401</width>
+       <height>81</height>
       </rect>
      </property>
      <property name="autoFillBackground">
@@ -521,8 +521,8 @@
     <widget class="QPushButton" name="testStartButton">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>160</y>
+       <x>10</x>
+       <y>200</y>
        <width>371</width>
        <height>35</height>
       </rect>

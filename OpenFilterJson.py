@@ -22,7 +22,7 @@ class OpenJsonFilter():
                 
                 listOfElements.append(line.split())
             
-        self.outputArray = np.asarray(listOfElements, dtype=int)
+        self.outputArray = np.asarray(listOfElements, dtype=float)
         
         return self.outputArray 
 

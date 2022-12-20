@@ -206,8 +206,9 @@ class MainWindow(QMainWindow):
         #self.figure.clear()
         self.dampPoints = vals
         plt.plot(self.frequency, vals, label="Damping plot" )
-        plt.plot(self.filterBoundries[:,0], self.filterBoundries[:,1], label="High limit")
-        plt.plot(self.filterBoundries[:,0], self.filterBoundries[:,2], label="Low limit")
+        plt.plot(self.filterBoundries[:,0], self.filterBoundries[:,1], '--', label="High limit")
+        
+        plt.plot(self.filterBoundries[:,0], self.filterBoundries[:,2], '--', label="Low limit")
         plt.xscale('log')
         plt.grid()
         plt.legend()
@@ -364,9 +365,10 @@ class MainWindow(QMainWindow):
             self.AISampleSize = int(self.selectedFilterDic['AISampleSize'])
 
             self.AOsampleRate = [int(i) for i in self.selectedFilterDic['AOSampleRate'].split(',')]
-            self.AOsampleSize = int(self.selectedFilterDic['AOSampleSize'])
+            #self.AOsampleSize = int(self.selectedFilterDic['AOSampleSize'])
+            self.AOsampleSize = [int(i) for i in self.selectedFilterDic['AOSampleSize'].split(',')]
 
-            self.frequency = [int(i) for i in self.selectedFilterDic['Frequency'].split(',')]
+            self.frequency = [float(i) for i in self.selectedFilterDic['Frequency'].split(',')]
 
             
         else: 
@@ -453,8 +455,8 @@ class AcqAndTestThread(QtCore.QThread):
         self.sampleSizeAI = sampleSizeAI
         self.sampleRateAI = sampleRateAI
 
-        #self.sampleSizeAO = sampleSizeAO
-        self.sampleSizeAO = [1000] * 41 #Eozwiązanie tymczasowe 
+        self.sampleSizeAO = sampleSizeAO
+        #self.sampleSizeAO = [1000] * 42 #Eozwiązanie tymczasowe 
         self.sampleRateAO = sampleRateAO
 
         self.freq = frequency
