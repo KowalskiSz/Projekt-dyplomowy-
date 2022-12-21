@@ -27,6 +27,8 @@ from DataBaseClass import *
 from OpenFilterJson import * 
 from Tdmscreator import * 
 
+from numpy import random
+
 
 class MainWindow(QMainWindow): 
     def __init__(self): 
@@ -75,6 +77,7 @@ class MainWindow(QMainWindow):
         self.qrAcqButton.setEnabled(False)
         self.createtdmsButton.setEnabled(False)
         self.abortScanButton.setEnabled(False)
+        self.okTestButton.setEnabled(False)
 
         '''
         Initialaize test values
@@ -125,6 +128,9 @@ class MainWindow(QMainWindow):
         
         self.progressBar.reset()
 
+
+        # self.testButton.clicked.connect(self.testfun)
+
        
         '''
         QRcode reader section
@@ -159,6 +165,12 @@ class MainWindow(QMainWindow):
         self.exitButton.clicked.connect(self.closeAppFun)
 
     
+    # def testfun(self): 
+    #     self.figure.clear()
+    #     x = random.randint(10)
+    #     plt.plot([1,2,3],[x,5,6])
+    #     self.canvas.draw()
+
     '''
     acquire signal and test section 
     '''
@@ -185,6 +197,7 @@ class MainWindow(QMainWindow):
         
         self.dampsTable.setRowCount(len(outList))
         self.dampsTable.setColumnCount(2)
+        self.createtdmsButton.setEnabled(True)
 
 
         for i in range(len(outList)): 
@@ -203,7 +216,7 @@ class MainWindow(QMainWindow):
 
     def updatePlot(self, vals): 
         
-        #self.figure.clear()
+        self.figure.clear()
         self.dampPoints = vals
         plt.plot(self.frequency, vals, label="Damping plot" )
         plt.plot(self.filterBoundries[:,0], self.filterBoundries[:,1], '--', label="High limit")
@@ -230,24 +243,60 @@ class MainWindow(QMainWindow):
 
         x = msg.exec_()
         
-
+    '''
+    Fucntions clearing all the settings, getting it back to the begining
+    '''
     def okButtonFun(self): 
-
-        plt.plot([0],[0])
-        self.canvas.draw()
         
+        self.figure.clear()
+        self.canvas.draw()
+
         self.testResultLabel.clear()
-        self.createtdmsButton.setEnabled(True)
         self.progressBar.reset()
 
-        self.dampsTable.clear()
+        self.filterTab.clearContents()
+        self.dampsTable.clearContents()
+        
+
+        self.AIsampleRate= None
+        self.AOsampleRate = None
+
+        self.AIsampleSize = None
+        self.AIsampleSize = None
+
+        self.frequency = None
+        self.finalDamps = None
+
+        self.testOutput = None
+
+        self.comboSetUpAI = None
+        self.comboSetUpAO = None 
+
+        self.abortFlag = False
+
+
+        self.selectedFilterNumber = None
+        self.selectedFilterDic = None
+
+        self.testStartButton.setEnabled(False)
+        self.submitFilterButton.setEnabled(False)
+        self.qrAcqButton.setEnabled(False)
+        self.createtdmsButton.setEnabled(False)
+        self.abortScanButton.setEnabled(False)
+        self.okTestButton.setEnabled(False)
+
+        self.DAQsetButton.setEnabled(True)
+
+
+
+   
         
 
     def updateProressBar(self, val): 
         
         self.progressBar.setValue(val)
 
-
+    
 
 
     '''
