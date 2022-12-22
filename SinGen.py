@@ -26,7 +26,8 @@ class SinGen():
         self.frequency = freq
         self.SampleRate = sampleRate
 
-        self.sampleSize = int(self.SampleRate / self.frequency)
+        self.sampleSize = 5 * int(self.SampleRate / self.frequency)
+        #print(self.sampleSize)
         self.tStep = 1/self.SampleRate
 
         self.timeS = np.linspace(0, ((self.sampleSize-1) * self.tStep), self.sampleSize)

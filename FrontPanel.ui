@@ -879,7 +879,7 @@
     <property name="styleSheet">
      <string notr="true">background-color: rgb(222, 255, 203)</string>
     </property>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>10</x>

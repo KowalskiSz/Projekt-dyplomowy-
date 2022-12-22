@@ -193,6 +193,7 @@ class MainWindow(QMainWindow):
 
         self.verObj = VerifyModule(self.filterBoundries)
         testResult, outList = self.verObj.verFun(self.dampPoints, self.frequency)
+        self.okTestButton.setEnabled(True)
         
         
         self.dampsTable.setRowCount(len(outList))
@@ -224,7 +225,7 @@ class MainWindow(QMainWindow):
         #plt.axvline(x = , color = 'b', label = 'cutoff')
         
         plt.xscale('log')
-        plt.set_facecolor('#EBEBEB')
+        #plt.set_facecolor('#EBEBEB')
         plt.grid(color="red", linewidth=0.7)
         plt.legend()
         self.canvas.draw()
@@ -274,6 +275,8 @@ class MainWindow(QMainWindow):
 
         self.abortFlag = False
 
+        self.finalDamps = None
+
 
         self.selectedFilterNumber = None
         self.selectedFilterDic = None
@@ -286,6 +289,8 @@ class MainWindow(QMainWindow):
         self.okTestButton.setEnabled(False)
 
         self.DAQsetButton.setEnabled(True)
+
+        
 
 
 
@@ -568,6 +573,7 @@ class AcqAndTestThread(QtCore.QThread):
             danej częstotliwości
 
             '''
+            
             np_fft = np.fft.fft(self.signalRead.dataContainer[200:])
             amplitudes = (np.abs(np_fft) / sSize) 
             aPlot = 2 * amplitudes[0:int(sSize/2 + 1)]

@@ -76,7 +76,7 @@ peaksVals = list()
 
 signalGen = SignalWriter(amplitude, 200, 'Dev1/ao0') #Sample generowane 200
 signalRead = SignalReader('Dev1/ai0') #Zmieniony został atrybut sampleSize na dynamiczny 
-dampTest = VerifyModule(frefBandStop2st)
+dampTest = VerifyModule(frefHigh2st)
 
 for f, sr, sSize in zip (freq, sampleRate, sampleSize): 
 
