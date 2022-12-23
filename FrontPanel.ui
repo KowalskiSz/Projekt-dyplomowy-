@@ -49,7 +49,7 @@
        <x>0</x>
        <y>0</y>
        <width>261</width>
-       <height>321</height>
+       <height>371</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -64,9 +64,9 @@
      <widget class="QLabel" name="labelNameDAQDev">
       <property name="geometry">
        <rect>
-        <x>50</x>
+        <x>10</x>
         <y>10</y>
-        <width>151</width>
+        <width>251</width>
         <height>71</height>
        </rect>
       </property>
@@ -84,12 +84,15 @@
       <property name="alignment">
        <set>Qt::AlignHCenter|Qt::AlignTop</set>
       </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
      </widget>
      <widget class="QComboBox" name="comboBoxAI">
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>130</y>
+        <y>200</y>
         <width>221</width>
         <height>31</height>
        </rect>
@@ -110,17 +113,47 @@
       </property>
       <item>
        <property name="text">
-        <string>Dev1/ai0</string>
+        <string>ai0</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>Dev1/ai1</string>
+        <string>ai1</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>Dev1/ai2</string>
+        <string>ai2</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>ai3</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>ai4</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>ai5</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>ai6</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>ai7</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>ai8</string>
        </property>
       </item>
      </widget>
@@ -128,7 +161,7 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>210</y>
+        <y>265</y>
         <width>221</width>
         <height>31</height>
        </rect>
@@ -146,17 +179,17 @@
       </property>
       <item>
        <property name="text">
-        <string>Dev1/ao0</string>
+        <string>ao0</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>Dev1/ao1</string>
+        <string>ao1</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>Dev1/ao2</string>
+        <string>ao2</string>
        </property>
       </item>
      </widget>
@@ -164,7 +197,7 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>100</y>
+        <y>170</y>
         <width>181</width>
         <height>21</height>
        </rect>
@@ -183,7 +216,7 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>175</y>
+        <y>230</y>
         <width>181</width>
         <height>31</height>
        </rect>
@@ -199,7 +232,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>260</y>
+        <y>310</y>
         <width>240</width>
         <height>52</height>
        </rect>
@@ -346,6 +379,40 @@
         </widget>
        </item>
       </layout>
+     </widget>
+     <widget class="QComboBox" name="comboBoxDevNames">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>130</y>
+        <width>221</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 255, 255)</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="devLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>100</y>
+        <width>191</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Daq device setup&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;&lt;br/&gt;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::RichText</enum>
+      </property>
      </widget>
     </widget>
     <widget class="QFrame" name="filterFrame">
@@ -1335,7 +1402,7 @@ QPushButton:active {
       </property>
      </widget>
     </widget>
-    <widget class="QLabel" name="labelNameDAQDev_3">
+    <widget class="QLabel" name="testsectionLabel">
      <property name="geometry">
       <rect>
        <x>460</x>

@@ -6,6 +6,7 @@ from PyQt5.QtCore import QCoreApplication
 
 
 import nidaqmx
+import nidaqmx.system
 import numpy as np
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -50,6 +51,21 @@ class MainWindow(QMainWindow):
         self.canvas = FigureCanvas(self.figure)
 
         self.horizantalLayout.addWidget(self.canvas)
+
+        '''
+        Get DAQ Devices available
+        '''
+
+        system = nidaqmx.system.System.local()
+        self.devices = list()
+
+        for device in system.devices:
+    
+            print(device.name)
+            self.devices.append(device.name)
+
+        self.comboBoxDevNames.clear()       # delete all items from comboBox
+        self.comboBoxDevNames.addItems(self.devices)
 
 
 
@@ -127,6 +143,7 @@ class MainWindow(QMainWindow):
         '''
         
         self.progressBar.reset()
+        self.progressBar.hide()
 
 
         # self.testButton.clicked.connect(self.testfun)
@@ -177,6 +194,7 @@ class MainWindow(QMainWindow):
     def acquireTest(self): 
 
         self.testStartButton.setEnabled(False)
+        self.progressBar.show()
 
         self.acqAndTestThread = AcqAndTestThread(1, self.AISampleSize, self.AIsampleRate, 
         self.AOsampleSize, self.AOsampleRate, self.frequency, self.filterBoundries, self.comboSetUpAO, self.comboSetUpAI)
@@ -289,6 +307,7 @@ class MainWindow(QMainWindow):
         self.okTestButton.setEnabled(False)
 
         self.DAQsetButton.setEnabled(True)
+        self.progressBar.hide()
 
         
 
@@ -309,8 +328,15 @@ class MainWindow(QMainWindow):
     '''
     def daqSet(self):
 
-        self.comboSetUpAI = self.comboBoxAI.currentText()
-        self.comboSetUpAO = self.comboBoxAO.currentText()
+        self.deviceName = self.comboBoxDevNames.currentText()
+        self.comboSetUpI = self.comboBoxAI.currentText()
+        self.comboSetUpO = self.comboBoxAO.currentText()
+
+        self.comboSetUpAI = f"{self.deviceName}/{self.comboSetUpI}"
+        self.comboSetUpAO = f"{self.deviceName}/{self.comboSetUpO}"
+
+        print(self.comboSetUpAI)
+        print(self.comboSetUpAO)
 
         self.DAQsetButton.setEnabled(False)
         self.submitFilterButton.setEnabled(True)
