@@ -27,6 +27,7 @@ from QRThread import *
 from DataBaseClass import * 
 from OpenFilterJson import * 
 from Tdmscreator import * 
+from ExcelWriter import * 
 
 from numpy import random
 
@@ -94,6 +95,7 @@ class MainWindow(QMainWindow):
         self.createtdmsButton.setEnabled(False)
         self.abortScanButton.setEnabled(False)
         self.okTestButton.setEnabled(False)
+        self.createXlsxFile.setEnabled(False)
 
         '''
         Initialaize test values
@@ -137,6 +139,11 @@ class MainWindow(QMainWindow):
         '''
 
         self.createtdmsButton.clicked.connect(self.createtdmsFile)
+
+        '''
+        Genereating excel file button
+        '''
+        self.createXlsxFile.clicked.connect(self.createExcelFile)
 
         '''
         progress bar initialization
@@ -217,6 +224,7 @@ class MainWindow(QMainWindow):
         self.dampsTable.setRowCount(len(outList))
         self.dampsTable.setColumnCount(2)
         self.createtdmsButton.setEnabled(True)
+        self.createXlsxFile.setEnabled(True)
 
 
         for i in range(len(outList)): 
@@ -230,8 +238,10 @@ class MainWindow(QMainWindow):
 
         if testResult == True: 
             self.testResultLabel.setText("Test Passed")
+            self.testOutput = "Passed"
         else: 
             self.testResultLabel.setText("Test Failed")
+            self.testOutput = "Failed"
 
     def updatePlot(self, vals): 
         
@@ -305,6 +315,7 @@ class MainWindow(QMainWindow):
         self.createtdmsButton.setEnabled(False)
         self.abortScanButton.setEnabled(False)
         self.okTestButton.setEnabled(False)
+        self.createXlsxFile.setEnabled(False)
 
         self.DAQsetButton.setEnabled(True)
         self.progressBar.hide()
@@ -504,6 +515,28 @@ class MainWindow(QMainWindow):
         msgg.setStandardButtons(QMessageBox.Ok)
 
         msgg.exec_()
+
+    '''
+    Creating excel file
+    '''
+
+    def createExcelFile(self): 
+
+        self._xlsxwriterObj = ExcelWriter(self.frequency, self.finalDamps, self.selectedFilterDic["FilterID"], self.selectedFilterDic["Type"], 
+        self.selectedFilterDic["DampInfo"], self.testOutput, self.filterBoundries[:,0], self.filterBoundries[:,1], self.filterBoundries[:,2])
+
+        self._xlsxwriterObj.createFile()
+
+        msex = QMessageBox()
+        msex.setIcon(QMessageBox.Information)
+        
+        msex.setWindowTitle("Excel file generated")
+        msex.setText(f"You Excel file has been generated!")
+        
+        msex.setStandardButtons(QMessageBox.Ok)
+
+        msex.exec_()
+
 
 
 

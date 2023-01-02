@@ -41,8 +41,8 @@ class SignalWriter():
 
         
         #while self.task.wait_until_done():
-        #self.output_waveform = self.wave_gen.generateWave(self.amplitude, freq, self.sampleRate, self.sampleSize)
-        #self.output_waveform = self.wave_gen.generateWave(self.amplitude, freq, self.sampleRate, self.sampleSize)
+        #self.output_waveform = self.wave_gen.generateWave(self.amplitude, self.frequency, self.sampleRate, 100)
+        #self.output_waveform = self.wave_gen.generateWave(self.amplitude, self.frequency, self.sampleRate, 100)
         self.output_waveform = self.wave_gen.generateWave(self.amplitude, self.frequency, self.sampleRate)
         self.writer = AnalogSingleChannelWriter(self.task.out_stream, auto_start=True)
         #self.xtimes = self.wave_gen.outout_times

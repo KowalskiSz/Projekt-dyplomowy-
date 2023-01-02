@@ -29,10 +29,10 @@ class WaveGeneration:
                 start=0, stop=sec_per_chunk, num=samplesPerChunk)
 
             #Creating output waveform 
-            output_waveform = amplitude * np.sin(
+            self.output_waveform = amplitude * np.sin(
                 self.output_times * rad_per_sec)
             
-            return output_waveform
+            return self.output_waveform
         else: 
             pass
 

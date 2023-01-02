@@ -13,7 +13,8 @@ class SinGenAnt:
 
     def generateWave(self, amplitude, freq, sampleRate, sampleSize):
 
-        T = 1/freq
+        #T = 1/freq
+        T = 500
         Ts = 1/sampleRate
 
         x = np.arange(sampleRate)

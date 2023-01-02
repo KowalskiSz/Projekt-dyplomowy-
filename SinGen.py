@@ -26,8 +26,15 @@ class SinGen():
         self.frequency = freq
         self.SampleRate = sampleRate
 
-        self.sampleSize = 5 * int(self.SampleRate / self.frequency)
+        '''
+        Added in case of dividing by 0 - for signal with 0 Hz frequnecy 
+        '''
+        if freq == 0: 
+            self.sampleSize = 1000
+        else:
+            self.sampleSize = 10 * int(self.SampleRate / self.frequency)
         #print(self.sampleSize)
+        #self.sampleSize = 1000
         self.tStep = 1/self.SampleRate
 
         self.timeS = np.linspace(0, ((self.sampleSize-1) * self.tStep), self.sampleSize)
