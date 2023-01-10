@@ -940,7 +940,7 @@
       <x>1310</x>
       <y>30</y>
       <width>471</width>
-      <height>251</height>
+      <height>301</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -952,30 +952,67 @@
        <x>10</x>
        <y>10</y>
        <width>451</width>
-       <height>221</height>
+       <height>271</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0">
-       <widget class="QLabel" name="tdmsLabel">
-        <property name="font">
-         <font>
-          <pointsize>16</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
+      <item row="2" column="0">
+       <widget class="QPushButton" name="createXlsxFile">
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
         </property>
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
+        <property name="styleSheet">
+         <string notr="true">
+.QPushButton {
+  appearance: none;
+  backface-visibility: hidden;
+  background-color: #27ae60;
+  border-radius: 8px;
+  border-style: none;
+  box-shadow: rgba(39, 174, 96, .15) 0 4px 9px;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: Inter,-apple-system,system-ui,&quot;Segoe UI&quot;,Helvetica,Arial,sans-serif;
+  font-size: 25px;
+  font-weight: 600;
+  letter-spacing: normal;
+  line-height: 1.5;
+  outline: none;
+  overflow: hidden;
+  padding: 13px 20px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  transform: translate3d(0, 0, 0);
+  transition: all .3s;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.QPushButton:hover {
+  background-color: #1e8449;
+  opacity: 1;
+  transform: translateY(0);
+  transition-duration: .35s;
+}
+
+.QPushButton:active {
+  transform: translateY(2px);
+  transition-duration: .35s;
+}
+
+.QPushButton:hover {
+  box-shadow: rgba(39, 174, 96, .2) 0 6px 12px;
+}
+</string>
         </property>
         <property name="text">
-         <string>Generate files</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-        <property name="indent">
-         <number>0</number>
+         <string>Excel file</string>
         </property>
        </widget>
       </item>
@@ -1039,8 +1076,31 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QPushButton" name="createXlsxFile">
+      <item row="0" column="0">
+       <widget class="QLabel" name="tdmsLabel">
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="text">
+         <string>Generate files</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="indent">
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QPushButton" name="csvButton">
         <property name="cursor">
          <cursorShape>PointingHandCursor</cursorShape>
         </property>
@@ -1095,7 +1155,7 @@
 </string>
         </property>
         <property name="text">
-         <string>Excel File</string>
+         <string>CSV file</string>
         </property>
        </widget>
       </item>
@@ -1494,7 +1554,7 @@ QPushButton:active {
     <property name="geometry">
      <rect>
       <x>1390</x>
-      <y>350</y>
+      <y>390</y>
       <width>381</width>
       <height>501</height>
      </rect>
@@ -1528,7 +1588,7 @@ QPushButton:active {
          <enum>QFrame::Box</enum>
         </property>
         <property name="text">
-         <string>Checked Damps and their frequencies</string>
+         <string>Checked damps and their frequencies</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -1545,12 +1605,12 @@ QPushButton:active {
         </property>
         <column>
          <property name="text">
-          <string>Frequency [Hz]</string>
+          <string>Damping [dB]</string>
          </property>
         </column>
         <column>
          <property name="text">
-          <string>Damping [dB]</string>
+          <string>Frequency [Hz]</string>
          </property>
         </column>
        </widget>

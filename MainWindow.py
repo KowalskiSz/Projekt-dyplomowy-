@@ -28,6 +28,7 @@ from DataBaseClass import *
 from OpenFilterJson import * 
 from Tdmscreator import * 
 from ExcelWriter import * 
+from CSVWriter import * 
 
 from numpy import random
 
@@ -96,6 +97,7 @@ class MainWindow(QMainWindow):
         self.abortScanButton.setEnabled(False)
         self.okTestButton.setEnabled(False)
         self.createXlsxFile.setEnabled(False)
+        self.csvButton.setEnabled(False)
 
         '''
         Initialaize test values
@@ -144,6 +146,11 @@ class MainWindow(QMainWindow):
         Genereating excel file button
         '''
         self.createXlsxFile.clicked.connect(self.createExcelFile)
+
+        '''
+        Generateing csv file button
+        '''
+        self.csvButton.clicked.connect(self.createCsvFile)
 
         '''
         progress bar initialization
@@ -225,6 +232,7 @@ class MainWindow(QMainWindow):
         self.dampsTable.setColumnCount(2)
         self.createtdmsButton.setEnabled(True)
         self.createXlsxFile.setEnabled(True)
+        self.csvButton.setEnabled(True)
 
 
         for i in range(len(outList)): 
@@ -316,6 +324,7 @@ class MainWindow(QMainWindow):
         self.abortScanButton.setEnabled(False)
         self.okTestButton.setEnabled(False)
         self.createXlsxFile.setEnabled(False)
+        self.csvButton.setEnabled(False)
 
         self.DAQsetButton.setEnabled(True)
         self.progressBar.hide()
@@ -537,6 +546,24 @@ class MainWindow(QMainWindow):
 
         msex.exec_()
 
+
+    '''
+    Creatinh csv file 
+    '''
+    def createCsvFile(self):
+
+        self._csvwriterobj = CSVwriter(self.frequency, self.finalDamps)
+        self._csvwriterobj.createFile()
+
+        msexcsv = QMessageBox()
+        msexcsv.setIcon(QMessageBox.Information)
+        
+        msexcsv.setWindowTitle("CSV file generated")
+        msexcsv.setText(f"You CSV file has been generated!")
+        
+        msexcsv.setStandardButtons(QMessageBox.Ok)
+
+        msexcsv.exec_()
 
 
 
