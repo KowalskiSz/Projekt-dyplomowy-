@@ -32,17 +32,33 @@ from CSVWriter import *
 
 from numpy import random
 
-
+'''
+Klasa głowna aplikacji, 
+w niej zawarte są wszystkie funkcjonalności programu 
+sama klasa dziedziczy po QMainWindow celem możliwości korzystania 
+z jej atrybutów
+'''
 class MainWindow(QMainWindow): 
+    
+    '''
+    Konstruktor klasy - odpowada za inicjlaizacje całego okna 
+    oraz wszytskich jego elementów, jak i funkcji z nimi powiązanych, które
+    umorzliwają ich działanie 
+    '''
     def __init__(self): 
         super(MainWindow,self).__init__()
+        '''
+        Załadowanie graficznej częsci frontu, zaprojetowanej 
+        w designerze i zapisaej jako plik .ui 
+        '''
         loadUi("FrontPanel.ui",self)
         
-
         self.setWindowTitle("Filter Tester")
 
         '''
-        Section to initialaize plot widget on main screen
+        Sekcja inicjalizująca plot widget na froncie 
+        jako obiekt klasy FigureCanvas z biblioteki 
+        Matplotlib
         '''
 
         self.horizantalLayout = QHBoxLayout(self.plotFrame)
@@ -55,7 +71,9 @@ class MainWindow(QMainWindow):
         self.horizantalLayout.addWidget(self.canvas)
 
         '''
-        Get DAQ Devices available
+        Algorytm komunikacji aplikacji z NI MAX
+        Celem pozyskania informacji o zainstalowanych 
+        urządzeniach pomiarowych 
         '''
 
         system = nidaqmx.system.System.local()
@@ -72,7 +90,8 @@ class MainWindow(QMainWindow):
 
 
         '''
-        Filter table initialozation
+        Inicjalizacja tabeli z informacjami o
+        załadownym filtrze
         '''
         self.filterTab.setColumnWidth(0,80)
         self.filterTab.setColumnWidth(1,150)
@@ -81,14 +100,14 @@ class MainWindow(QMainWindow):
         self.filterTab.setLineWidth(20)
 
         '''
-        Damps and frequency table
+        Inicjalizacja tabeli tłumień i częstotliwości 
         '''
         self.dampsTable.setColumnWidth(0,120)
         self.dampsTable.setColumnWidth(1,120)
         self.dampsTable.setLineWidth(20)
 
         '''
-        Prevnting from starting testing with no data
+        Funkcje wyszarzania przycisków przy starcie aplikacji 
         '''
         self.testStartButton.setEnabled(False)
         self.submitFilterButton.setEnabled(False)
@@ -100,7 +119,8 @@ class MainWindow(QMainWindow):
         self.csvButton.setEnabled(False)
 
         '''
-        Initialaize test values
+        Inicjalizacja zmiennych wykorzystwanych w pomiarach
+        oraz tescie
         '''
         self.AIsampleRate= None
         self.AOsampleRate = None
@@ -115,8 +135,8 @@ class MainWindow(QMainWindow):
         self.testOutput = None
 
         '''
-        ComboBox values init
-        getting values from comboboxes function
+        Pozyskiwanie danych list rozwijanych 
+        przy inicjalizacji sprzętu DAQ
         '''
         self.comboSetUpAI = None
         self.comboSetUpAO = None 
@@ -125,35 +145,36 @@ class MainWindow(QMainWindow):
         self.cancelSetupButton.clicked.connect(self.cancelSetup)
 
         '''
-        Variable for the filter boundries data
+        Zmienne przechowujące wartości graniczne oraz
+        tłumienie 
         '''
 
         self.filterBoundries = None
         self.dampPoints = None
 
         '''
-        Ok button
+        Slot przycisku OK
         '''
         self.okTestButton.clicked.connect(self.okButtonFun)
 
         '''
-        Generating tdms file button
+        Slot przycisku TDMS
         '''
 
         self.createtdmsButton.clicked.connect(self.createtdmsFile)
 
         '''
-        Genereating excel file button
+       Slot przycisku Excel FIle
         '''
         self.createXlsxFile.clicked.connect(self.createExcelFile)
 
         '''
-        Generateing csv file button
+        slot przycisku CSV
         '''
         self.csvButton.clicked.connect(self.createCsvFile)
 
         '''
-        progress bar initialization
+        inicjalizacja paska stau testu
         '''
         
         self.progressBar.reset()
@@ -164,7 +185,7 @@ class MainWindow(QMainWindow):
 
        
         '''
-        QRcode reader section
+        Sekcja obsługi QR kodu
         '''
         self.abortFlag = False #Flag to prevent the abort qr read error
        
@@ -173,7 +194,7 @@ class MainWindow(QMainWindow):
         
        
         '''
-        Submit chosen filter by selecting with combobox
+        Sekcja wyboru filtra przez listę rozwijaną 
         '''
         self.selectedFilterNumber = None
         self.selectedFilterDic = None
@@ -184,26 +205,20 @@ class MainWindow(QMainWindow):
         self.submitFilterButton.clicked.connect(lambda: self.dataBaseConnection(self.selectedFilterNumber))
 
         '''
-        Test class and testing algorythm call
+        Slot przycisku startu testu
         '''
 
         self.testStartButton.clicked.connect(self.acquireTest)
 
 
         '''
-        Close button event handling
+        Slot przyscisku zamykającego aplkacje 
         '''
         self.exitButton.clicked.connect(self.closeAppFun)
 
     
-    # def testfun(self): 
-    #     self.figure.clear()
-    #     x = random.randint(10)
-    #     plt.plot([1,2,3],[x,5,6])
-    #     self.canvas.draw()
-
     '''
-    acquire signal and test section 
+    metoda obsługująca działanie wątku akwizycji testu
     '''
     def acquireTest(self): 
 
@@ -221,6 +236,9 @@ class MainWindow(QMainWindow):
         self.acqAndTestThread.updateProgressBar.connect(self.updateProressBar)
         self.acqAndTestThread.finished.connect(self.popUpMessageTest)
 
+    '''
+    Metoda weryfikacji poprawności testu
+    '''
     def testResult(self): 
 
         self.verObj = VerifyModule(self.filterBoundries)
@@ -251,6 +269,9 @@ class MainWindow(QMainWindow):
             self.testResultLabel.setText("Test Failed")
             self.testOutput = "Failed"
 
+    '''
+    Metoda obsługująca wyświetlanie wykresu 
+    '''
     def updatePlot(self, vals): 
         
         self.figure.clear()
@@ -281,7 +302,8 @@ class MainWindow(QMainWindow):
         x = msg.exec_()
         
     '''
-    Fucntions clearing all the settings, getting it back to the begining
+    Metoda czyszcząca pamięć oraz resetująca 
+    do ustawień początkowych 
     '''
     def okButtonFun(self): 
         
@@ -334,7 +356,9 @@ class MainWindow(QMainWindow):
 
 
    
-        
+    '''
+    meotoda aktulalizacji paska postępu
+    '''
 
     def updateProressBar(self, val): 
         
@@ -344,7 +368,7 @@ class MainWindow(QMainWindow):
 
 
     '''
-    Daq setup functions section
+    Metoda obsługująca wybór DAQ oraz wejść i wyjść
     '''
     def daqSet(self):
 
@@ -373,7 +397,8 @@ class MainWindow(QMainWindow):
         
 
     '''
-    QRCode reader section
+    Sekcja metody obsługującej działanie 
+    skanera QR
     '''
 
     def QRFun(self): 
@@ -388,6 +413,10 @@ class MainWindow(QMainWindow):
         #self.QRThread.finished.connect(self.popUpQRMessage)
         #self.QRThread.finished.connect(lambda: self.dataBaseConnection(self.QRThread.data))
 
+    '''
+    Metoda obsługująca wyświetlanie rejstrowanego 
+    obrazu przez kamerę na froncie
+    '''
     def imageUpdateSlot(self, image): 
 
         self.camQR.setPixmap(QPixmap.fromImage(image))
@@ -428,6 +457,9 @@ class MainWindow(QMainWindow):
 
         self.camQR.clear()
 
+    '''
+    Metoda przerwania akwizycji wizji 
+    '''
     def abortFun(self): 
 
         self.abortFlag = True
@@ -437,7 +469,7 @@ class MainWindow(QMainWindow):
         self.camQR.clear()
 
     '''
-    Combobox filter section
+    Wybór filtra jako elementu listy rozwijanej 
     '''
 
     def submitSelectedFilter(self): 
@@ -451,8 +483,7 @@ class MainWindow(QMainWindow):
 
         
     '''
-    Database section - creating instace of an obj, 
-    writing info into table
+    Metoda obsługi bazy danych  
     '''
     def dataBaseConnection(self, filterNumber): 
 
@@ -461,8 +492,8 @@ class MainWindow(QMainWindow):
             self._dataBaseInst.exeFun()
 
             '''
-            Setting up a variable that holds info about filter
-            used next to initialize the test  
+            Inicjalizacja zmiennej typy dict, która przechowuje informacja
+            pobrane w bazy danych, które wykorzystywane są w programie
             '''
             self.selectedFilterDic = self._dataBaseInst.dataDic
 
@@ -471,6 +502,9 @@ class MainWindow(QMainWindow):
             self.filterTab.setItem(0, 2, QTableWidgetItem(self._dataBaseInst.dataDic["DampInfo"]))
             self.testStartButton.setEnabled(True)
 
+            '''
+            Konwersja danych z bazy z tyou string na odpowienie typy urzytskowe
+            '''
             self.AIsampleRate = [int(i) for i in self.selectedFilterDic['AISampleRate'].split(',')]
             self.AISampleSize = int(self.selectedFilterDic['AISampleSize'])
 
@@ -484,7 +518,9 @@ class MainWindow(QMainWindow):
         else: 
             return 0 
         
-    
+    '''
+    Popup zwracający na frontpanel informacje o aktulanie wybranym filtrze
+    '''
     def popUpMessage(self): 
         
         #QtWidgets.QMessageBox.information(self, "Done", "Acqusition completed") 
@@ -498,14 +534,10 @@ class MainWindow(QMainWindow):
 
         msg.exec_()
 
-        
-    
-    '''
-    Database and table section
-    '''
 
     '''
-    Creating tdms file section 
+    Metoda generujaca plik tdms po 
+    instancji bietu klasy Tdmscreator 
     '''
         
     def createtdmsFile(self): 
@@ -526,9 +558,9 @@ class MainWindow(QMainWindow):
         msgg.exec_()
 
     '''
-    Creating excel file
+    Metoda generujaca plik xlsx po 
+    instancji bietu klasy ExcelWriter 
     '''
-
     def createExcelFile(self): 
 
         self._xlsxwriterObj = ExcelWriter(self.frequency, self.finalDamps, self.selectedFilterDic["FilterID"], self.selectedFilterDic["Type"], 
@@ -548,7 +580,8 @@ class MainWindow(QMainWindow):
 
 
     '''
-    Creatinh csv file 
+    Metoda generujaca plik csv po 
+    instancji bietu klasy CSVwriter 
     '''
     def createCsvFile(self):
 
@@ -569,13 +602,13 @@ class MainWindow(QMainWindow):
 
 
     '''
-    Closing app by clicking the Exit button
+    metoda obsługująca event zamknięcia aplikacji poprzez "X"
     '''
     def closeAppFun(self): 
         QCoreApplication.instance().quit()
 
     '''
-    Exiting app by clicking cross
+    Definicja eventu
     '''
     def closeEvent(self, event): 
         reply = QMessageBox.question(self, 'Window Close', 'Do you really want to exit?', 
@@ -588,14 +621,24 @@ class MainWindow(QMainWindow):
 
 
 '''
-Data acqusition and test sequence thread class
+Klasa obsługująca wątek odpowiedzialny za akwizycję i generacje
+sygnału testującego
 '''
 class AcqAndTestThread(QtCore.QThread): 
 
+    '''
+    Zdefiniwanie zmiennych pyqtSignal pozwalających 
+    na wysyłanie danch z wątku do klasy Main
+    '''
     dampPoints = pyqtSignal(list)
     testResult = pyqtSignal(bool)
     updateProgressBar = pyqtSignal(int)
 
+    '''
+    Konstruktor klasy przyjmujący dane 
+    definiujące sposób genracji i akwizycji 
+    Dane pobierane są z bazy danych  
+    '''
     def __init__(self, amp, sampleSizeAI, sampleRateAI, sampleSizeAO, sampleRateAO, frequency, damps, AOSetup, AISetup):
         super().__init__() 
         
@@ -606,7 +649,7 @@ class AcqAndTestThread(QtCore.QThread):
         self.sampleRateAI = sampleRateAI
 
         self.sampleSizeAO = sampleSizeAO
-        #self.sampleSizeAO = [1000] * 42 #Eozwiązanie tymczasowe 
+       
         self.sampleRateAO = sampleRateAO
 
         self.freq = frequency
@@ -617,7 +660,9 @@ class AcqAndTestThread(QtCore.QThread):
 
         self.progressVal = 0 
 
-
+        '''
+        Inicjalizacja kolejek FIFO na dane wyjściowe
+        '''
         self.q = queue.Queue()
         self.qAmps = queue.Queue()
         
@@ -625,19 +670,30 @@ class AcqAndTestThread(QtCore.QThread):
         self.yVals = list() 
         self.peaksVals = list()
 
-        
-        self.signalGen = SignalWriter(self.amplitude, sampleSizeAI, self.AOSetup) #Sample generowane 200
-        self.signalRead = SignalReader(self.AISetup) #Zmieniony został atrybut sampleSize na dynamiczny
+        '''
+        Tworzenie obiektów instancji klas generacji i akwizycji sygnału  
+        '''
+        self.signalGen = SignalWriter(self.amplitude, sampleSizeAI, self.AOSetup) 
+        self.signalRead = SignalReader(self.AISetup) 
 
-    
+    '''
+    metoda wyliczająca tłumienie 
+    sygnału na podstawie amplitudy
+    '''
     def dampingCount(self, amps):
          
         for a in amps: 
-            v = 20*(np.log10(a))
+            v = 20*(np.log10(a/1))
             self.results.put(v)
 
         return self.results
 
+    '''
+    przeciążenie metody run wątku
+    sekwencja odbywa się jako kolejne iteracje pętli 
+    do któej przekazywane są welkości niezbędne generacji i odczytowi 
+    częstotliowść, częst. próbkowania, wielkości buforów
+    '''
     def run(self): 
         
         for f, sr, sSize in zip (self.freq, self.sampleRateAI, self.sampleSizeAO): 
@@ -645,6 +701,10 @@ class AcqAndTestThread(QtCore.QThread):
             self.progressVal = self.progressVal + 1
             self.updateProgressBar.emit(self.progressVal)
 
+            '''
+            Sekwencja generacji i awizycji na metodach 
+            klas Write i Read
+            '''
             self.signalGen.createTask(f, sr)
                
             self.signalRead.create_task(sr,sSize)
@@ -657,10 +717,11 @@ class AcqAndTestThread(QtCore.QThread):
             '''
             Poprawna akwizycja i obliczanie amplitud syg. dla 
             danej częstotliwości
+            Wykorzystano metode klasy scipy do FFT oraz 
+            znajdowania wartości szczytowej danej części sygnału 
 
             '''
-            
-            np_fft = np.fft.fft(self.signalRead.dataContainer[200:])
+            np_fft = np.fft.fft(self.signalRead.dataContainer[200:]) #Wycięcie z otrzymanych wartości sygnału 200 pierwszyc próbek 
             amplitudes = (np.abs(np_fft) / sSize) 
             aPlot = 2 * amplitudes[0:int(sSize/2 + 1)]
         
@@ -681,15 +742,16 @@ class AcqAndTestThread(QtCore.QThread):
 
             self.peaksVals.append(self.qAmps.get())
 
-        # results = queue.Queue()   
-        # for a in self.peaksVals: 
-        #     v = 20*(np.log10(a))
-        #     results.put(v)
+
         self.results = queue.Queue()
         self.res = self.dampingCount(self.peaksVals)
 
        
 
+        '''
+        Zwracanie końcowej listy otrzymanych punktów 
+        tłumienia sygnału po wszytkich iteracjach pętli głównej 
+        '''
         self.finalList = []
         while not self.res.empty():
             
@@ -697,17 +759,18 @@ class AcqAndTestThread(QtCore.QThread):
 
         self.dampPoints.emit(self.finalList)
         
-        
-
-
+'''
+Wywołanie klasy Main
+'''        
 if __name__ == "__main__": 
 
+    '''
+    Stworzenie instancji klasy MainWindow 
+    przy włączeniu sesji programu 
+    '''
     app = QApplication(sys.argv)
     mainWidndow = MainWindow()
   
-
-    #mainWidndow.setFixedWidth(1565)
-    #mainWidndow.setFixedHeight(900)
     mainWidndow.show()
 
     sys.exit(app.exec_())

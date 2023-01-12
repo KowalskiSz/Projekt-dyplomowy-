@@ -1,33 +1,47 @@
 import numpy as np 
 
+'''
+klasa zawierająca algorytm weryfikacji poprawności 
+działania filtra na podstawie jego tłumień 
+'''
 class VerifyModule(): 
 
+    '''
+    Konstruktor klasy przyjmuje dane graniczne 
+    fitra
+    '''
     def __init__(self, filterList):
         
 
-        self.filterList = filterList #Potraktujmy to jak matrix NxM
-        # self.damp = None
-        # self.frequency = None
+        self.filterList = filterList 
+        
         self.result = False
         self.counter = 0
 
         self.outList = list()
 
-        #self.rowAndCols = None
+        '''
+        Przekształcenie danych na macierz klasy np 
+        '''
         self.rowAndCols = np.shape(self.filterList)
         self.arrayOfVals = np.zeros(shape=self.rowAndCols[0], dtype=np.int8)
-        #print(self.filterList) 
+         
 
-    
+    '''
+    metoda wykonująca algorytm weryfikacyjny 
+    Polega on na porównywaniu, dla konkretnych wartości 
+    częstotliowośc, wartości tłumienia pod względem jej 
+    położenia między wartościami granicznymi 
+    '''
     def verFun(self, damps, frequency):
         
         self.counter = 0
-        # self.damps = damps
-        # self.frequency = frequency
-        #print((frequency))
-        #print(damps)
 
-        
+        '''
+        Algorytm wykonywany jest w pętli for 
+        każda iteracja oznacza kolejne wartości częstotliowści
+        dla których porównywane są wartości tłumienia 
+        '''        
         for i in range(len(frequency)):
         #for freq, damp in zip(frequency, damps): 
             
@@ -58,9 +72,16 @@ class VerifyModule():
                     
         
         
-        print(self.arrayOfVals)
+        #print(self.arrayOfVals)
+        '''
+        Weryfikacja zawartości wektora 
+        zgodności danych
+        oraz wrócenie rezulatatu z funkcji 
+        '''
         if np.all((self.arrayOfVals == 0)):
+
             result = False
+
         else:    
             result = np.max(self.arrayOfVals) == np.min(self.arrayOfVals)
         
