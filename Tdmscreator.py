@@ -1,29 +1,42 @@
 from nptdms import TdmsWriter, RootObject, GroupObject, ChannelObject
 from datetime import datetime
 
-
+'''
+Klasa obsługująca generację plku TDMS
+na podstawie metod biblioteki npTDMS
+'''
 class Tdmscreator:
 
+    '''
+    Konstruktor przyjmujący wymagane do zapisu w plik 
+    dane 
+    '''
     def __init__(self, frequency, damping, filterID, filterType, coffFreq, testResult, frequencyDamp, dampsHigh,
                  dampsLow):
 
+        '''
+        Wydobycie aktualnej dokładej daty 
+        '''
         self._dateNow = datetime.now()
 
         '''
-        Frequency and damping values
+        Zdefiniwanie zmiennych na 
+        częstotliowść oraz tłumienie otrzymane z testu
         '''
         self._frequency = frequency
         self._damping = damping
 
         '''
-        damping boundries values
+        Zmienne na dane z pliku
+        z ograniczeniami filtra
         '''
         self._frequencyDamp = frequencyDamp
         self._dampsHigh = dampsHigh
         self._dampsLow = dampsLow
 
         '''
-        Filter and test info
+        Zmienne na informacje o badanym 
+        filtrze oraz wyniku testu 
         '''
         self._testResult = testResult
         self._filterID = filterID
@@ -33,11 +46,19 @@ class Tdmscreator:
         self.setTrueflag = False
 
 
+    '''
+    metoda generująca główny plik
+    '''
     def createFile(self):
 
+        '''
+        Konwerscja danych daty na string aby 
+        były możiwie do wykorzystania przy zapisie 
+        '''
         self._dateNow = self._dateNow.strftime("%d_%b_%Y_%H_%M_%S")
         '''
-        Root object - only one in the file
+        Root object - zdefinicja w pliku tdms, 
+        jest jedna na cały plik 
         '''
         self.root_object = RootObject(properties={
             "Filter ID": f"{self._filterID}",
@@ -46,7 +67,8 @@ class Tdmscreator:
             "Test Result": f"{self._testResult}"
         })
         '''
-        group objects - three of them; to damping data, to high bound freq, low band freq
+        group objects - zdefiniwanie grup w pliku zawierających dane
+        tłumienia oraz czestotliwości
         '''
         self.group_object_Bode = GroupObject("Bode Diagram", properties={
             "Frequency": "Hz",
@@ -66,6 +88,10 @@ class Tdmscreator:
         self.channel_object_dampLow =  ChannelObject("Damping Boundries", "Damping Low Value [dB]", self._dampsLow,
                                                           properties=None)
 
+        '''
+        Zapisa zdefiowanych sruktur do głównego 
+        pliku z rozszerzeniem tdms
+        '''
         with TdmsWriter(f"Tdms/TdmsFile{self._dateNow}.tdms") as tdms_writer:
 
             tdms_writer.write_segment([
@@ -84,16 +110,4 @@ class Tdmscreator:
 
 
 
-
-
-# #
-# if __name__ == "__main__":
-
-#     # (self, frequency, damping, filterID, filterType, coffFreq, testResult, frequencyDamp, dampsHigh,
-#     #  dampsLow):
-
-# #
-#     obj = Tdmscreator([1,2,3,4,5,6], [9,8,7,6,5,4,3,2,1], 'ID', "Type", "2555", "Passed", [4,4,4,4,4,4],
-#                       [5,5,5,5,5,5,5], [4,4,4,4,4,4,4,8])
-#     obj.createFile()
 

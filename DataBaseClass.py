@@ -1,12 +1,18 @@
 import sqlite3
-'''
-Function has to get a id, by that id open database, read proper record, 
-extract significant data from colums, asign them to variables
-'''
 
-
+'''
+Klasa obsługująca funkcjonalnośĆ połączenia 
+oraz obłsugi bazy danych na podstawie biblioteki 
+sqlite3
+'''
 class DatabaseReader:
 
+    '''
+    Konstruktor klasy przyjmujący ID 
+    konkretngo filtra
+    Zdefiniowane są także kontenery pamięci 
+    do obsługi danych z bazy 
+    '''
     def __init__(self, filterID):
 
         self.filterID = filterID
@@ -18,23 +24,32 @@ class DatabaseReader:
         self.dataDic = None
 
 
+    '''
+    metoda obsługująca połączenie z utowrzoną bazą 
+    '''
     def exeFun(self):
 
         self._conn = sqlite3.connect("Filters.db")
 
         '''
-        main connection and fetching data from table
+        otwarcie głownego połączenia oraz 
+        odczyt danych z bazy
         '''
         self._c = self._conn.cursor()
 
+        '''
+        zdefiniowane zapytanie SQL wyszukujące fitra (rekordu) w bazie 
+        na podstawie jego ID 
+        '''
         self._c.execute("SELECT * FROM FiltersInfo WHERE FilterID = (:fID)", {'fID': self.filterID})
         self._items = self._c.fetchone()
+        
         '''
-        Getting names of columns from table
+        Kolejne zapytanie SQL wydobywające nazwy kolumn tabeli w bazie 
+
         '''
         self._cc = self._conn.cursor()
         cols = self._cc.execute("SELECT * FROM FiltersInfo")
-
 
         for columns in cols.description:
 
@@ -43,11 +58,17 @@ class DatabaseReader:
         tuple(self._column)
 
         '''
-        Comminitg actions and Closing database 
+        Metody wykonujące powyższe zapytania do bazy 
+        oraz zamykające połączneie 
         '''
         self._conn.commit()
         self._conn.close()
 
+        '''
+        Organizacja odczytanych danych z bazy dotyczące
+        filtra w typ danych dict tworzący pary 
+        key:value
+        '''
         if self._column and self._items is None: 
             
             return 0 
@@ -56,20 +77,7 @@ class DatabaseReader:
 
             self.dataDic = dict(zip(self._column, self._items))
 
-        #return  self.dataDic
-
-
-'''
-Only fopr testtig purposes
-'''
-
-
-# if __name__ == "__main__":
-
-#     db = DatabaseReader('000004')
-#     db.exeFun()
-
-#     print(db.dataDic['Id'])
+        
 
 
 

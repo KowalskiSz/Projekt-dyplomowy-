@@ -7,18 +7,21 @@ from WaveformGenerator import WaveGeneration
 from nidaqmx._task_modules.channels.ao_channel import AOChannel
 from nidaqmx._task_modules.channel_collection import ChannelCollection
 
-'''
-Drugi sposób generacji sinusa
-'''
 from SinGenAnt import SinGenAnt
 from SinGen import SinGen
 
-
-
+'''
+Klasa odpowiedzialna za generowanie sygnału wyjściowego, poprzez
+komunikcje z DAQ
+'''
 class SignalWriter(): 
 
-    #incoming_data = QtCore.pyqtSignal(object)
-
+    
+    '''
+    Konstruktor klasy przyjmujący parametry sygnału: 
+    amplituda, wielkość bufora oraz fizyczne nasawy 
+    DAQ
+    '''
     def __init__(self, amplitude, sampleSize, daqSetup):
         
         self.amplitude = amplitude
@@ -36,7 +39,10 @@ class SignalWriter():
         self.daqSetup = daqSetup
         
 
-    
+    '''
+    metoda callback przyjmuje nastawy sygnału sinusoidalnego 
+    do generacji oraz otiwera samą generację na DAQ
+    '''
     def callback(self):
 
         
@@ -50,19 +56,28 @@ class SignalWriter():
             
         print("Creating signal...")
             
-
+    '''
+    metoda zwalniająca zasoby
+    '''
     def endGen(self):
 
-        #self.task.wait_until_done()
         self.task.stop()
         self.task.close()
 
+    '''
+    Metoda przyjmująca częstotliość generowanego sygnału
+    oraz częstotliowść próbkowania syganłu 
+    '''
     def createTask(self, freq, sampleRate):
 
        
         self.sampleRate = sampleRate 
         self.frequency = freq
 
+        '''
+        Utowrzenie instancji klasy Task określającej 
+        parametry wyjścia karty DAQ
+        '''
         try: 
             self.task = nidaqmx.Task()
         
@@ -71,11 +86,17 @@ class SignalWriter():
             self.isConnented = False
 
             return 
-
+        '''
+        wywołanie metody na obiekcie task określającej
+        charakter generowanego sygnału 
+        '''
         self.task.ao_channels.add_ao_voltage_chan(self.daqSetup , max_val=5, min_val=-5)
-        #self.task.ao_channels.add_ao_func_gen_chan("Dev1/ao0", type=FuncGenType.SINE,freq=100.0, amplitude=1.0, offset=0.0) #TUTAJ SKOŃCZONE
-        #buffer_lenght = self.sampleSize
-
+    
+        '''
+        metoda określająca częstotliowść próbkowania sygnalu,
+        wielkośc bufora na wygenerowane próbki oraz
+        typ akwizycji jako CONTINUOUS
+        '''
         self.task.timing.cfg_samp_clk_timing(
             rate=self.sampleRate,
             samps_per_chan=self.sampleSize,  #buffer_lenght 
@@ -83,8 +104,9 @@ class SignalWriter():
             sample_mode=AcquisitionType.CONTINUOUS,
         ) 
 
-        #self.task.out_stream.output_buf_size = buffer_lenght
-        #self.task.out_stream.timeout=5000
+        '''
+        wywołanie funkcji callback 
+        '''
         self.callback()
 
 

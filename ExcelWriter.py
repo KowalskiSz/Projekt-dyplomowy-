@@ -1,28 +1,42 @@
 import xlsxwriter
 from datetime import datetime
 
+'''
+Klasa generująca plik xlsx, na podsatwie metod biblioteki 
+xlsxwriter
+'''
 class ExcelWriter:
 
+    '''
+    Konstruktor przyjmujący wymagane do zapisu w plik 
+    dane 
+    '''
     def __init__(self,frequency, damping, filterID, filterType, coffFreq, testResult, frequencyDamp, dampsHigh,
                  dampsLow):
-
+        
+        '''
+        Wydobycie aktualnej dokładej daty 
+        '''
         self._dateNow = datetime.now()
 
         '''
-        Frequency and damping values
+        Zdefiniwanie zmiennych na 
+        częstotliowść oraz tłumienie otrzymane z testu
         '''
         self._frequency = frequency
         self._damping = damping
 
         '''
-        damping boundries values
+        Zmienne na dane z pliku
+        z ograniczeniami filtra
         '''
         self._frequencyDamp = frequencyDamp
         self._dampsHigh = dampsHigh
         self._dampsLow = dampsLow
 
         '''
-        Filter and test info
+        Zmienne na informacje o badanym 
+        filtrze oraz wyniku testu 
         '''
         self._testResult = testResult
         self._filterID = filterID
@@ -32,16 +46,33 @@ class ExcelWriter:
         self.indexOfData = None
         self.indexB = None
 
+    '''
+    metoda określająca generacje wszystkich wymaganych 
+    struktur orazgenerująca główny plik 
+    '''
     def createFile(self):
 
+        '''
+        konwersja danych daty na string
+        '''
         self._dateNow = self._dateNow.strftime("%d_%b_%Y_%H_%M_%S")
 
+        '''
+        Stworzenie objektu definiującego cały workbook 
+        '''
         self.workbook = xlsxwriter.Workbook(f"Excel/Excelfile{self._dateNow}.xlsx")
 
+        '''
+        zdefiniwanie w workbooku wszytskich worksheetów - 
+        zakładek
+        '''
         self.worksheet = self.workbook.add_worksheet("Overall Info")
         self.datasheet = self.workbook.add_worksheet("Main Data")
         self.plotSheet = self.workbook.add_worksheet("Plot")
 
+        '''
+        Zdefiniwanie formatowania pliku (tabele, pogrubienia itd.)
+        '''
         self.f1 = self.workbook.add_format({'border': 2, 'border_color': 'green', 'bold': 'True', 'align': 'center'})
         self.f2 = self.workbook.add_format({'border': 2, 'border_color': 'red', 'bold': 'True', 'align': 'center'})
 
@@ -51,7 +82,7 @@ class ExcelWriter:
         self.center.set_align('center')
 
         '''
-        First worksheet code, with overall data 
+        Dane dla pierwszego worksheetu 
         
         '''
         self.worksheet.write('A2', "Filter ID", self.bold)
@@ -70,7 +101,8 @@ class ExcelWriter:
         self.worksheet.set_column(0,1,20)
 
         '''
-        Writing main data into file
+        Wpisywanie danych głwnych dotyczących 
+        filtra do pliku
         '''
 
         self.datasheet.write('A1', "Frequency [Hz]", self.f2)
@@ -89,7 +121,8 @@ class ExcelWriter:
 
 
         '''
-        Uploading raw frequency data
+        Nadpisywanie wartości pozyskiwanych przy 
+        teście do pliku 
         '''
         for self.indexOfData, vals in enumerate(self._frequency):
             self.datasheet.write(self.indexOfData+1,0,vals,self.center)
@@ -98,7 +131,7 @@ class ExcelWriter:
             self.datasheet.write(index + 1, 1, vals, self.center)
 
         '''
-        Damping boundries data
+        Dane dotyczące wartości granicznch oraz ich zapis 
         '''
         for self.indexB, vals in enumerate(self._frequencyDamp):
             self.datasheet.write(self.indexB+1,3, vals, self.center)
@@ -113,14 +146,14 @@ class ExcelWriter:
 
 
         '''
-        Creating a plot of acquired data
+        CGenerowanie wykresu na podstawie zebranych dancych pomiarowych 
         '''
 
         self.plot = self.workbook.add_chart({'type': 'scatter', 'subtype': 'straight'})
         self.plotBoundries = self.workbook.add_chart({'type': 'scatter', 'subtype': 'straight'})
 
         '''
-        Creating seriaes of data to plot
+        Tworzenie serii da wykresu 
         '''
 
         self.plot.add_series({
@@ -143,6 +176,9 @@ class ExcelWriter:
             'name': "Boundries High"
         })
 
+        '''
+        Edycja osi wykresu oraz jego wielkośći 
+        '''
         self.plot.set_title({'name': 'Damping plot'})
         
         self.plot.set_y_axis({'name': 'Dampimg [dB]'})
@@ -161,17 +197,8 @@ class ExcelWriter:
         self.plotSheet.insert_chart('C3', self.plot)
 
 
-
+        '''
+        Zapis do pliku, zwolnienie zasobów
+        '''
         self.workbook.close()
 
-#
-# if __name__ == "__main__":
-#
-# #     # (self, frequency, damping, filterID, filterType, coffFreq, testResult, frequencyDamp, dampsHigh,
-# #     #  dampsLow):
-#
-#
-#     obj = ExcelWriter([10,50,100,200,300,1000,10000,25000,26000], [9,8,7,6,5,4,3,2,1], 'ID', "Type", "2555", "Passed", [1,10,20,100,1000,10000,25000],
-#                     [10,20,52,87,6,15,12],[4,8,7,10,4,8,8])
-#
-#     obj.createFile()

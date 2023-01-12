@@ -1,12 +1,24 @@
 import numpy as np 
 
-
+'''
+Klasa obsługująca odczyt danych 
+granicznych dla filtra z pliku tekstowego 
+oraz wpisywanie ich w typ zmiannej array 
+'''
 class OpenJsonFilter(): 
 
+    '''
+    konstrutor definiujący pusty zasób 
+    na dane odczytane z pliku
+    '''
     def __init__(self):
 
         self.outputArray = None
 
+    '''
+    Metoda obsługująca sczytanie danych 
+    z pliku tekstowego na podstawnie id filtra 
+    '''
     def openJson(self, fileNumber): 
 
         with open(f'Files/filtr_{fileNumber}.txt', 'r') as file: 
@@ -16,6 +28,10 @@ class OpenJsonFilter():
                 
         file.close()
 
+        '''
+        Organizacja odczytanych danych w typ danych 
+        array klasy np
+        '''
         listOfElements = list()
             
         for line in lines: 
@@ -26,12 +42,3 @@ class OpenJsonFilter():
         
         return self.outputArray 
 
-
-
-# if __name__ == "__main__":
-
-#     x = OpenJsonFilter()
-#     l = x.openJson('000001')
-#     print(l[:,0])
-#     print(l[:,1])
-#     print(l[:,2])
