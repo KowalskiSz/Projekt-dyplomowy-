@@ -434,7 +434,7 @@ class MainWindow(QMainWindow):
             else:
 
                 self.abortFlag == True
-                self.popUpQRMessage("No in data base")
+                self.popUpQRMessage("that does not exist")
                    
 
             #self.resQRLabel.setText(self.QRThread.fileName)
@@ -537,7 +537,7 @@ class MainWindow(QMainWindow):
 
     '''
     Metoda generujaca plik tdms po 
-    instancji bietu klasy Tdmscreator 
+    instancji obiektu klasy Tdmscreator 
     '''
         
     def createtdmsFile(self): 
@@ -710,9 +710,6 @@ class AcqAndTestThread(QtCore.QThread):
             self.signalRead.create_task(sr,sSize)
 
             self.signalGen.endGen()
-
-            
-            
 
             '''
             Poprawna akwizycja i obliczanie amplitud syg. dla 

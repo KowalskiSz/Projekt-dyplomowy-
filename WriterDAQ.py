@@ -3,11 +3,11 @@ import nidaqmx
 import numpy as np
 from nidaqmx.constants import AcquisitionType, RegenerationMode, FuncGenType
 from nidaqmx.stream_writers import AnalogMultiChannelWriter, AnalogSingleChannelWriter
-from WaveformGenerator import WaveGeneration
+
 from nidaqmx._task_modules.channels.ao_channel import AOChannel
 from nidaqmx._task_modules.channel_collection import ChannelCollection
 
-from SinGenAnt import SinGenAnt
+
 from SinGen import SinGen
 
 '''
@@ -45,13 +45,8 @@ class SignalWriter():
     '''
     def callback(self):
 
-        
-        #while self.task.wait_until_done():
-        #self.output_waveform = self.wave_gen.generateWave(self.amplitude, self.frequency, self.sampleRate, 100)
-        #self.output_waveform = self.wave_gen.generateWave(self.amplitude, self.frequency, self.sampleRate, 100)
         self.output_waveform = self.wave_gen.generateWave(self.amplitude, self.frequency, self.sampleRate)
         self.writer = AnalogSingleChannelWriter(self.task.out_stream, auto_start=True)
-        #self.xtimes = self.wave_gen.outout_times
         self.writer.write_many_sample(self.output_waveform)
             
         print("Creating signal...")
@@ -99,8 +94,8 @@ class SignalWriter():
         '''
         self.task.timing.cfg_samp_clk_timing(
             rate=self.sampleRate,
-            samps_per_chan=self.sampleSize,  #buffer_lenght 
-            # Sample mode: Tells it to continuously output whatever is in the buffer
+            samps_per_chan=self.sampleSize,  #wielkość bufora 
+            # Sample mode: Tutaj sygnał generowanyj jest ciągle, aż do momentu przerwania taska
             sample_mode=AcquisitionType.CONTINUOUS,
         ) 
 

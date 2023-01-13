@@ -45,7 +45,6 @@ class QRThread(QThread):
     wątku 
     '''
     def run(self): 
-
         '''
         zdefiniowanie flag określających 
         wykonanie czynności 
@@ -57,9 +56,6 @@ class QRThread(QThread):
 
         print("initialozation")
         self.cap = cv2.VideoCapture(0)
-
-        #cap.set(3,250)
-        #cap.set(4,250)
 
         '''
         Pętla główna obsługująca działanie 

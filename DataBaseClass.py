@@ -70,11 +70,8 @@ class DatabaseReader:
         key:value
         '''
         if self._column and self._items is None: 
-            
             return 0 
-
-        else: 
-
+        else:
             self.dataDic = dict(zip(self._column, self._items))
 
         

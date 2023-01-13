@@ -74,8 +74,6 @@ class SignalReader():
         '''
         self.reader.read_many_sample(data=self.dataContainer, number_of_samples_per_channel=sample_size)
 
-        
-        
         '''
         metoda zwlaniająca zasoby 
         kiedy warunki akwyzycji są spełnione
