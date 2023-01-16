@@ -16,6 +16,8 @@ sqlite3
 openCV  
 pyzbar  
 json  
+  
+Biblioteki pobrac przez pip w ostatniej wersji dostępnej. 
 
 Instrukcja obsługi aplikacji: wybór fizycznej karty (na podstawie nazwy z NI MAX), wybór fizycznych kanałów, wybór filtra, start testu, po otrzymaniu wyników - 
 zapis do plików, reset. Po zresetowaniu aplikacji nalezy ponownie zatwierdzić DAQ klikając "Set Values". Inaczej wszystkie inne przyciski pozostaną wyszarzone.  
