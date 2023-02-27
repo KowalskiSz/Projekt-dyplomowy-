@@ -1,23 +1,4 @@
-# Projekt-dyplomowy  
-Aplikacja do testowania filtrów analogowych napisana w oparciu o Pythona oraz bibliotekę firmy NI, za pomocą fizycznej karty DAQ. 
-Wykorzystane moduły:  
-nidaqmx  
-PyQt5  
-numpy  
-matplotlib  
-queue  
-math  
-scipy  
-datetime  
-csv  
-xlsxwriter  
-nptdms  
-sqlite3  
-openCV  
-pyzbar  
-json  
-  
-
-Instrukcja obsługi aplikacji: wybór fizycznej karty (na podstawie nazwy z NI MAX), wybór fizycznych kanałów, wybór filtra, start testu, po otrzymaniu wyników - 
-zapis do plików, reset. Po zresetowaniu aplikacji nalezy ponownie zatwierdzić DAQ klikając "Set Values". Inaczej wszystkie inne przyciski pozostaną wyszarzone.  
-Aplikację uruchamia się poprzez wywołanie pliku MainWindow.py. 
+# Analog filter tester
+The application is entirely based on Python and the special library (nidaqmx) provided by National Instruments so that it can communicate with the DAQ equipment in order to acquire data from real electric object (the RC filter)  
+Frontend of the app is written with PyQt 5 along with Matplotlib library to visualize the results of a tests (as Bode diagram).  
+In addition, to perform mathematical operations like FFT or generating the sine wave, packeges like SciPy and NumPy were also widely used. 
