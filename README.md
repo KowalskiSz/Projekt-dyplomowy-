@@ -3,4 +3,6 @@ The application is entirely based on Python and the special library (nidaqmx) pr
 Frontend of the app is written with PyQt 5 along with Matplotlib library to visualize the results of a tests (as Bode diagram).  
 In addition, to perform mathematical operations like FFT or generating the sine wave, packeges like SciPy and NumPy were also widely used.  
   
-The app allows to save collected data in three different ways - the TDMS file, CSV file and xlsx file where additionally implemented script (in python) to generate plot and organise data to be better sorted. 
+The app allows to save collected data in three different ways - the TDMS file, CSV file and xlsx file where additionally implemented script (in python) to generate plot and organise data to be better sorted.  
+
+The data used to execute the tests such as sampling rates, required sample size and informations about the filter is being stored in the database (SQLite). 
